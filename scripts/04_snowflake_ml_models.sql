@@ -1,0 +1,33 @@
+-- 04_snowflake_ml_models.sql: Snowflake ML Anomaly Detection & 30-Day Forecasting
+USE WAREHOUSE AUTOMOTIVE_WH;
+USE DATABASE AUTOMOTIVE_INTELLIGENCE_DB;
+USE SCHEMA PUBLIC;
+
+-- 1. Create Snowflake ML Anomaly Detection Model
+-- Trains an automated anomaly detection model on daily fleet telemetry metrics
+CREATE OR REPLACE SNOWFLAKE.ML.ANOMALY_DETECTION FLEET_TELEMETRY_ANOMALY_MODEL(
+    INPUT_DATA => TABLE(V_DAILY_FLEET_DTC_AGGREGATE),
+    TIMESTAMP_COLNAME => 'RECORD_DATE',
+    TARGET_COLNAME => 'TOTAL_DTC_FAILURES',
+    LABEL_COLNAME => NULL
+);
+
+-- 2. Call Anomaly Detection Model to identify historical telemetry anomalies
+CALL FLEET_TELEMETRY_ANOMALY_MODEL!DETECT_ANOMALIES(
+    INPUT_DATA => TABLE(V_DAILY_FLEET_DTC_AGGREGATE),
+    TIMESTAMP_COLNAME => 'RECORD_DATE',
+    TARGET_COLNAME => 'TOTAL_DTC_FAILURES'
+);
+
+-- 3. Create Snowflake ML Forecast Model for 30-Day Failure Prediction
+CREATE OR REPLACE SNOWFLAKE.ML.FORECAST DTC_FAILURE_FORECAST_MODEL(
+    INPUT_DATA => TABLE(V_DAILY_FLEET_DTC_AGGREGATE),
+    TIMESTAMP_COLNAME => 'RECORD_DATE',
+    TARGET_COLNAME => 'TOTAL_DTC_FAILURES'
+);
+
+-- 4. Execute 30-Day Failure Forecast
+CALL DTC_FAILURE_FORECAST_MODEL!FORECAST(
+    FORECASTING_PERIODS => 30,
+    CONFIG_OBJECT => {'prediction_interval': 0.95}
+);
