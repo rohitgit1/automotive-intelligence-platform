@@ -502,7 +502,8 @@ with tab8:
             try:
                 conn = get_snowflake_connection()
                 cursor = conn.cursor()
-                cursor.execute(f"SELECT * FROM TABLE(SEARCH_DTC_KNOWLEDGE_BASE('{rag_query.replace(\"'\", \"''\")}'))")
+                safe_query = rag_query.replace("'", "''")
+                cursor.execute(f"SELECT * FROM TABLE(SEARCH_DTC_KNOWLEDGE_BASE('{safe_query}'))")
                 rows = cursor.fetchall()
                 if rows:
                     for r in rows:
@@ -514,3 +515,4 @@ with tab8:
                     st.info("No matching service bulletins found.")
             except Exception as e:
                 st.error(f"Vector search execution error: {e}")
+
