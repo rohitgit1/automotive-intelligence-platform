@@ -1,0 +1,12 @@
+manifest_version: 1
+
+artifacts:
+  setup_script: setup_script.sql
+  default_streamlit: app_instance
+
+configuration:
+  log_level: debug
+
+privileges:
+  - CREATE DATABASE:
+      description: "Permission to create internal automotive telemetry analytical databases"
