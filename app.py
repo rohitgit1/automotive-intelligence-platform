@@ -14,88 +14,233 @@ from cortex_agents import CortexAgentsEngine
 # Streamlit Page Config
 st.set_page_config(
     page_title="Automotive Intelligence Platform | Snowflake RCA & Predictive Maintenance",
-    page_icon="🚗",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling (Dark Glassmorphism Theme)
+# Advanced Ultra-Premium Dark Glassmorphism Styling
 st.markdown("""
 <style>
-    /* Dark Theme Base */
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    /* Global Dark Theme Background */
     .stApp {
-        background-color: #0d1117;
-        color: #e6edf3;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    
-    /* Header Gradient */
-    .header-box {
-        background: linear-gradient(135deg, #1f6feb 0%, #1158c7 50%, #093986 100%);
-        padding: 24px;
-        border-radius: 12px;
-        margin-bottom: 24px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .header-title {
-        font-size: 32px;
-        font-weight: 800;
-        color: #ffffff;
-        margin: 0;
-        letter-spacing: -0.5px;
-    }
-    
-    .header-subtitle {
-        font-size: 16px;
-        color: #8b949e;
-        margin-top: 6px;
+        background: radial-gradient(circle at 50% 0%, #0f172a 0%, #090d16 100%);
+        color: #f8fafc;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Metric Cards */
-    .metric-card {
-        background: rgba(22, 27, 34, 0.8);
-        backdrop-filter: blur(10px);
-        border: 1px solid #30363d;
-        border-radius: 10px;
-        padding: 18px;
-        text-align: center;
-        transition: transform 0.2s ease, border-color 0.2s ease;
+    /* Top Glow Bar Header */
+    .hero-header {
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 28px 36px;
+        margin-bottom: 28px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
     }
-    
-    .metric-card:hover {
-        transform: translateY(-2px);
-        border-color: #58a6ff;
+
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -20%;
+        width: 60%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+        pointer-events: none;
     }
-    
-    .metric-value {
-        font-size: 30px;
+
+    .hero-title {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #38bdf8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 6px 0;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .hero-subtitle {
+        font-size: 15px;
+        color: #94a3b8;
+        font-weight: 400;
+        letter-spacing: 0.2px;
+    }
+
+    .live-badge {
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #34d399;
+        padding: 6px 14px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+    }
+
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background-color: #34d399;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #34d399;
+    }
+
+    /* Premium Metric Card */
+    .kpi-card {
+        background: rgba(15, 23, 42, 0.65);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 16px;
+        padding: 22px 24px;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(56, 189, 248, 0.4);
+        box-shadow: 0 15px 35px rgba(56, 189, 248, 0.12);
+    }
+
+    .kpi-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .kpi-label {
+        font-size: 12px;
         font-weight: 700;
-        color: #58a6ff;
-    }
-    
-    .metric-label {
-        font-size: 13px;
-        color: #8b949e;
+        color: #64748b;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-top: 4px;
+        letter-spacing: 0.8px;
     }
-    
-    /* Agent Badge */
-    .agent-badge {
-        background-color: #238636;
+
+    .kpi-icon-wrapper {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+    }
+
+    .kpi-value {
+        font-size: 32px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: #f8fafc;
+        margin-bottom: 6px;
+    }
+
+    .kpi-subtext {
+        font-size: 12px;
+        color: #94a3b8;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Sleek Custom Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background: rgba(15, 23, 42, 0.7);
+        padding: 8px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        height: 44px;
+        border-radius: 10px;
+        color: #94a3b8;
+        font-weight: 600;
+        font-size: 13px;
+        border: none !important;
+        padding: 0 16px;
+        transition: all 0.2s ease;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35) !important;
+    }
+
+    /* Buttons */
+    .stButton>button {
+        background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
         color: #ffffff;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 12px 24px;
+        border: none;
+        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
+        transition: all 0.2s ease;
+    }
+
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45);
+        color: #ffffff;
+    }
+
+    /* Content Cards & RAG Panels */
+    .result-card {
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-left: 4px solid #38bdf8;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .agent-card {
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid rgba(192, 132, 252, 0.2);
+        border-left: 4px solid #c084fc;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 16px;
+    }
+
+    .score-chip {
+        background: rgba(56, 189, 248, 0.15);
+        color: #38bdf8;
+        font-weight: 700;
         padding: 4px 10px;
         border-radius: 20px;
         font-size: 12px;
-        font-weight: 600;
-        display: inline-block;
-        margin-bottom: 10px;
+        font-family: 'JetBrains Mono', monospace;
     }
-    
-    /* Hide Streamlit Menu Footer */
+
+    /* Custom Dataframe Styling */
+    .stDataFrame {
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* Hide Streamlit Branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
@@ -139,7 +284,7 @@ def load_fleet_metrics():
             "affected_vehicles": affected_vehicles,
             "failure_rate": round(affected_vehicles * 100.0 / max(total_vehicles, 1), 2)
         }
-    except Exception as e:
+    except Exception:
         return {
             "total_vehicles": 10000,
             "total_telemetry": 302883,
@@ -214,14 +359,17 @@ def load_supplier_breakdown():
 
 # Header Section
 st.markdown("""
-<div class="header-box">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+<div class="hero-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2;">
         <div>
-            <h1 class="header-title">🚗 Automotive Intelligence Platform</h1>
-            <div class="header-subtitle">Real-Time Vehicle Quality Analytics • Multi-Agent Cortex Root Cause Analysis • 30-Day Predictive Maintenance</div>
+            <h1 class="hero-title">🚗 Automotive Intelligence Platform</h1>
+            <div class="hero-subtitle">Real-Time Vehicle Quality Analytics • Multi-Agent Cortex Root Cause Analysis • 30-Day Predictive Maintenance</div>
         </div>
         <div style="text-align: right;">
-            <span class="agent-badge">⚡ SNOWFLAKE CORTEX LLM & VECTOR RAG POWERED</span>
+            <div class="live-badge">
+                <span class="pulse-dot"></span>
+                SNOWFLAKE CORTEX LLM & VECTOR RAG ACTIVE
+            </div>
         </div>
     </div>
 </div>
@@ -229,37 +377,53 @@ st.markdown("""
 
 # Fleet KPI Cards Row
 metrics = load_fleet_metrics()
-col1, col2, col3, col4 = st.columns(4)
+c1, c2, c3, c4 = st.columns(4)
 
-with col1:
+with c1:
     st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-value">{metrics['total_vehicles']:,}</div>
-        <div class="metric-label">Connected Vehicles</div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span class="kpi-label">Connected Vehicles</span>
+            <div class="kpi-icon-wrapper" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">🚘</div>
+        </div>
+        <div class="kpi-value">{metrics['total_vehicles']:,}</div>
+        <div class="kpi-subtext">Active Fleet Telemetry Monitoring</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col2:
+with c2:
     st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-value">{metrics['total_telemetry']:,}</div>
-        <div class="metric-label">Telemetry Events Processed</div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span class="kpi-label">Telemetry Events</span>
+            <div class="kpi-icon-wrapper" style="background: rgba(129, 140, 248, 0.15); color: #818cf8;">📡</div>
+        </div>
+        <div class="kpi-value">{metrics['total_telemetry']:,}</div>
+        <div class="kpi-subtext">Multi-Cloud Aggregated Telemetry</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col3:
+with c3:
     st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-value" style="color: #ff7b72;">{metrics['total_dtc_errors']:,}</div>
-        <div class="metric-label">DTC Fault Events</div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span class="kpi-label">DTC Fault Events</span>
+            <div class="kpi-icon-wrapper" style="background: rgba(244, 63, 94, 0.15); color: #f43f5e;">⚠️</div>
+        </div>
+        <div class="kpi-value" style="color: #f43f5e;">{metrics['total_dtc_errors']:,}</div>
+        <div class="kpi-subtext">Critical Battery & BMS Error Codes</div>
     </div>
     """, unsafe_allow_html=True)
 
-with col4:
+with c4:
     st.markdown(f"""
-    <div class="metric-card">
-        <div class="metric-value" style="color: #d29922;">{metrics['failure_rate']}%</div>
-        <div class="metric-label">Fleet Affected Rate</div>
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span class="kpi-label">Fleet Affected Rate</span>
+            <div class="kpi-icon-wrapper" style="background: rgba(251, 191, 36, 0.15); color: #fbbf24;">⚡</div>
+        </div>
+        <div class="kpi-value" style="color: #fbbf24;">{metrics['failure_rate']}%</div>
+        <div class="kpi-subtext">Targeted Recall Action Scope</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -267,14 +431,14 @@ st.markdown("<br>", unsafe_allow_html=True)
 
 # Navigation Tabs
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-    "📊 Fleet Command Center",
-    "🗺️ Geospatial Risk Map",
-    "🔍 Automated Root Cause Analysis",
-    "🔮 30-Day Failure Forecasting",
-    "💬 Cortex AI Agent Hub",
-    "📑 Executive Quality Audit Report",
-    "🎛️ What-If Simulation Engine",
-    "📚 Cortex Vector RAG Search"
+    "📊 Fleet Command",
+    "🗺️ Geospatial Map",
+    "🔍 Root Cause Engine",
+    "🔮 30-Day Forecast",
+    "💬 Cortex AI Hub",
+    "📑 Executive Report",
+    "🎛️ What-If Simulator",
+    "📚 Vector RAG Search"
 ])
 
 # -----------------------------------------------------------------------
@@ -290,16 +454,20 @@ with tab1:
         fig_trend = px.line(
             trend_df, x="date_values", y="dtc_errors",
             title="Daily Telemetry DTC Fault Spikes & Weather Correlation",
-            labels={"date_values": "Date", "dtc_errors": "DTC Error Count"},
+            labels={"date_values": "Date", "dtc_errors": "DTC Fault Count"},
             line_shape="spline",
-            color_discrete_sequence=["#ff7b72"]
+            color_discrete_sequence=["#38bdf8"]
         )
         fig_trend.update_layout(
             template="plotly_dark",
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(22,27,34,0.8)",
-            height=380
+            plot_bgcolor="rgba(15,23,42,0.6)",
+            font=dict(family="Plus Jakarta Sans", color="#94a3b8"),
+            height=400,
+            margin=dict(l=20, r=20, t=50, b=20)
         )
+        fig_trend.update_xaxes(showgrid=True, gridcolor="rgba(255,255,255,0.05)")
+        fig_trend.update_yaxes(showgrid=True, gridcolor="rgba(255,255,255,0.05)")
         st.plotly_chart(fig_trend, width="stretch")
 
     with col_right:
@@ -307,14 +475,16 @@ with tab1:
         fig_supplier = px.pie(
             supplier_df, values="total_dtc_errors", names="supplier_name",
             title="DTC Fault Distribution by Supplier",
-            hole=0.4,
-            color_discrete_sequence=px.colors.qualitative.Dark24
+            hole=0.45,
+            color_discrete_sequence=["#38bdf8", "#818cf8", "#c084fc", "#f43f5e", "#fbbf24"]
         )
         fig_supplier.update_layout(
             template="plotly_dark",
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(22,27,34,0.8)",
-            height=380
+            plot_bgcolor="rgba(15,23,42,0.6)",
+            font=dict(family="Plus Jakarta Sans", color="#94a3b8"),
+            height=400,
+            margin=dict(l=20, r=20, t=50, b=20)
         )
         st.plotly_chart(fig_supplier, width="stretch")
 
@@ -325,9 +495,9 @@ with tab2:
     st.subheader("Geospatial Fleet Telemetry & Weather Strain Overlays")
     map_df = load_vehicle_map_data()
     
-    st.write("Displaying vehicle locations across North America color-coded by telemetry DTC risk level:")
+    st.markdown("Displaying connected vehicle positions color-coded by DTC fault risk and ambient weather conditions:")
     if not map_df.empty:
-        st.map(map_df, latitude='lat', longitude='lon', size=15, color='#ff7b72')
+        st.map(map_df, latitude='lat', longitude='lon', size=15, color='#f43f5e')
     else:
         st.info("Map telemetry data loading...")
 
@@ -336,7 +506,7 @@ with tab2:
 # -----------------------------------------------------------------------
 with tab3:
     st.subheader("Multi-Variable Automated Root Cause Investigation")
-    st.write("Cross-referencing Telemetry, Battery Chemistry (Cathode/Anode), Supplier Batches, and Temperature Extremes.")
+    st.markdown("Cross-referencing Telemetry, Battery Chemistry (Cathode/Anode), Supplier Batches, and Temperature Extremes:")
     
     supplier_df = load_supplier_breakdown()
     st.dataframe(supplier_df, width="stretch")
@@ -346,8 +516,12 @@ with tab3:
             try:
                 engine = CortexAgentsEngine()
                 rca_report = engine.run_root_cause_analysis_agent()
-                st.markdown("### 🔬 Cortex RCA Agent Findings")
+                st.markdown("""
+                <div class="agent-card">
+                    <div style="font-weight: 700; color: #c084fc; font-size: 16px; margin-bottom: 8px;">🔬 Cortex Root Cause Analysis Agent Report</div>
+                """, unsafe_allow_html=True)
                 st.info(rca_report)
+                st.markdown("</div>", unsafe_allow_html=True)
             except Exception as e:
                 st.error(f"Error running Cortex RCA Agent: {e}")
 
@@ -371,15 +545,16 @@ with tab4:
 
     fig_fc = go.Figure()
     fig_fc.add_trace(go.Scatter(x=fc_df["Date"], y=fc_df["Upper_Bound"], mode='lines', line=dict(width=0), showlegend=False))
-    fig_fc.add_trace(go.Scatter(x=fc_df["Date"], y=fc_df["Lower_Bound"], mode='lines', line=dict(width=0), fill='tonexty', fillcolor='rgba(88, 166, 255, 0.2)', name='95% Confidence Interval'))
-    fig_fc.add_trace(go.Scatter(x=fc_df["Date"], y=fc_df["Forecasted_Failures"], mode='lines+markers', line=dict(color='#58a6ff', width=3), name='Forecasted Failures'))
+    fig_fc.add_trace(go.Scatter(x=fc_df["Date"], y=fc_df["Lower_Bound"], mode='lines', line=dict(width=0), fill='tonexty', fillcolor='rgba(56, 189, 248, 0.15)', name='95% Confidence Interval'))
+    fig_fc.add_trace(go.Scatter(x=fc_df["Date"], y=fc_df["Forecasted_Failures"], mode='lines+markers', line=dict(color='#38bdf8', width=3), name='Forecasted Failures'))
     
     fig_fc.update_layout(
         title="30-Day Ahead Fleet DTC Failure Forecast (Snowflake ML Model)",
         template="plotly_dark",
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(22,27,34,0.8)",
-        height=400
+        plot_bgcolor="rgba(15,23,42,0.6)",
+        font=dict(family="Plus Jakarta Sans", color="#94a3b8"),
+        height=420
     )
     st.plotly_chart(fig_fc, width="stretch")
 
@@ -426,16 +601,17 @@ with tab5:
 with tab6:
     st.subheader("Executive Quality Audit & Financial ROI Summary")
     st.markdown("""
-    ### 📋 Executive Summary: Vehicle Quality Root Cause Analysis
+    <div class="result-card" style="border-left-color: #34d399;">
+        <h3 style="margin-top: 0; color: #34d399;">📋 Executive Summary: Vehicle Quality Root Cause Analysis</h3>
+        <p><strong>Key Findings & Financial Impact:</strong></p>
+        <ul>
+            <li><strong>Primary Defect Driver:</strong> Cold ambient weather (&lt; 32°F) triggers cathode voltage drop in Lithium NMC-811 battery packs.</li>
+            <li><strong>Supplier Concentration:</strong> ACME Battery Energy Technologies batch #2024-B.</li>
+            <li><strong>Targeted Recall ROI:</strong> <strong>$14.2 Million</strong> in avoided broad warranty recall claims over 12 months.</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
     
-    **Key Findings:**
-    1. **Primary Component Defect:** Extreme cold temperatures (< 32°F) cause rapid voltage drop in Lithium NMC-811 battery packs manufactured by **ACME Battery Energy Technologies**.
-    2. **Root Cause:** Cathode degradation under sub-zero thermal strain combined with overcurrent protection trigger DTC Code `E-804`.
-    3. **Estimated ROI & Warranty Savings:**
-       - **Targeted Recall Scope Reduction:** 65% reduction in broad vehicle recalls by restricting service to specific VIN batches.
-       - **Direct Cost Savings:** **$14.2 Million** in projected warranty claims avoided over 12 months.
-       - **Proactive Maintenance Improvement:** 30-day failure forecasting allows component replacement before customer breakdowns.
-    """)
     st.download_button(
         "📥 Download Full Executive Audit Report (Markdown)",
         data="""# EXECUTIVE AUTOMOTIVE QUALITY AUDIT REPORT
@@ -474,7 +650,6 @@ with tab7:
     with c_sim3:
         voltage_limit = st.slider("Overcharge Protection Limit (V)", min_value=3.8, max_value=4.5, value=4.2, step=0.05)
     
-    # Calculate simulated failure factor
     base_failures = 5210
     temp_factor = 1.0 + (abs(temp_delta) * 0.035 if temp_delta < 0 else temp_delta * 0.01)
     cathode_factor = 0.55 if "LFP" in cathode_choice else (0.25 if "Solid-State" in cathode_choice else 1.0)
@@ -507,12 +682,16 @@ with tab8:
                 rows = cursor.fetchall()
                 if rows:
                     for r in rows:
-                        st.markdown(f"#### 📄 {r[0]} (Code: `{r[1]}`)")
-                        st.write(r[2])
-                        st.caption(f"Vector Cosine Similarity Score: **{round(r[3], 4)}**")
-                        st.divider()
+                        st.markdown(f"""
+                        <div class="result-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h4 style="margin: 0; color: #f8fafc;">📄 {r[0]} (Code: <code style="color:#38bdf8;">{r[1]}</code>)</h4>
+                                <span class="score-chip">Cosine Similarity: {round(r[3], 4)}</span>
+                            </div>
+                            <p style="color: #cbd5e1; font-size: 14px; margin-top: 8px;">{r[2]}</p>
+                        </div>
+                        """, unsafe_allow_html=True)
                 else:
                     st.info("No matching service bulletins found.")
             except Exception as e:
                 st.error(f"Vector search execution error: {e}")
-
