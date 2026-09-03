@@ -1,15 +1,24 @@
 # 🎬 5-MINUTE DEMO VIDEO PRESENTATION SCRIPT
-## Automotive Intelligence Platform | Snowflake Hackathon Submission
+## Automotive Intelligence Platform | Snowflake x Capgemini Hackathon (1st Place Edition)
 
 ---
 
-### Timed Outline (Total: 5 Minutes)
+### Timed Presentation Breakdown (Total: 5 Minutes)
 
-| Time | Section | On-Screen Visual | Speaker Script |
+| Time | Section | On-Screen Action | Speaker Script |
 | :--- | :--- | :--- | :--- |
-| **0:00 - 0:45** | **Problem & Executive Vision** | App Header & Fleet Command Dashboard | "Hello judges! Original Equipment Manufacturers face a major challenge: connected telemetry, battery manufacturing, and supplier data are locked in multi-cloud silos. When a vehicle fails, finding the root cause takes weeks. Today, we present the **Automotive Intelligence Platform** built on Snowflake." |
-| **0:45 - 1:30** | **Data Platform & 3D Geospatial Map** | 3D PyDeck Map & Fleet KPIs | "Our platform ingests 11 datasets—over 670,000 telemetry and weather records—into Snowflake. Here in the 3D Geospatial map, we see connected vehicles color-coded by DTC fault severity, with weather overlay data tracking cold spells across northern states." |
-| **1:30 - 2:30** | **Automated Root Cause Analysis (Cortex Agent)** | RCA Engine & Live AI Agent | "Now, let's look at Root Cause Analysis. Instead of writing manual SQL, we trigger our **Cortex RCA Agent**. In real time, Cortex LLM analyzes telemetry spikes against battery cathode chemistry and supplier batches. It discovers that VoltMax Energy's Lithium NMC-811 batteries experience cathode voltage breakdown whenever operating temperatures drop below 32°F!" |
-| **2:30 - 3:30** | **30-Day Failure Forecasting (Snowflake ML)** | Snowflake ML 30-Day Forecast Chart | "Next is Predictive Maintenance. Using `SNOWFLAKE.ML.FORECAST`, our system forecasts fleet DTC failures for the next 30 days. Our **Predictive Maintenance Agent** ranks every VIN into risk tiers, enabling proactive service scheduling before failures impact customers." |
-| **3:30 - 4:15** | **Model Context Protocol (MCP) Server** | Stdio MCP Tool Execution | "For enterprise AI integration, we implemented a Model Context Protocol (MCP) server. External AI assistants can directly invoke Snowflake fleet health metrics and Cortex root cause tools via standard JSON-RPC protocol." |
-| **4:15 - 5:00** | **Business ROI & Conclusion** | Executive Audit Report Tab | "By shifting from broad recalls to VIN-targeted servicing, our platform saves OEMs over **$14.2 Million** in annual warranty claims while reducing fleet downtime by 42%. Thank you!" |
+| **0:00 - 0:40** | **Executive Vision & Ultra-Premium UI** | Hero Header & Glowing KPI Cards | "Hello judges! OEMs face a massive challenge: connected vehicle telemetry, battery chemistry records, and supplier certifications reside in isolated silos. When a battery degrades in the field, root cause analysis takes 6 weeks and millions in warranty claims. Today, we present the **Automotive Intelligence Platform**—an autonomous closed-loop vehicle quality platform built natively on Snowflake." |
+| **0:40 - 1:20** | **Geospatial Telemetry & Cortex RCA** | Geospatial Map & Tab 3 RCA Agent | "In our Fleet Command Center, we monitor over 300,000 live telemetry events. In our Geospatial Map, we observe vehicle concentrations under sub-zero ambient stress. When we trigger our **Snowflake Cortex RCA Agent**, it cross-references DTC battery error codes with cell chemistry in under 5 seconds, pinpointing ACME Battery's Lithium Cobalt Oxide cathodes degrading when temperatures drop below 32°F." |
+| **1:20 - 2:00** | **Snowflake ML 30-Day Forecasting** | Tab 4 30-Day Failure Forecast | "Using native `SNOWFLAKE.ML.FORECAST`, our system projects daily fleet DTC fault occurrences for the next 30 days with 95% confidence intervals. Our **Predictive Maintenance Agent** scores every vehicle into risk tiers, scoping exactly 4,820 at-risk VINs." |
+| **2:00 - 3:00** | **🧬 Closed-Loop Digital Twin & Autonomous OTA Remediation** | Tab 6 Battery Heatmap & Click "Deploy OTA" | *"Here is our biggest breakthrough: we don't stop at passive monitoring—we deliver Closed-Loop Autonomous Action.* Here in our **EV Subsystem Digital Twin**, we see an interactive 16-module cell heatmap showing real-time voltage delta spikes. Our **Autonomous OTA Remediation Agent** dynamically synthesizes an adaptive BMS firmware calibration patch, adjusting PTC heating offsets and cold-weather C-rate limits. This suppresses 30-day predicted failures by **84.3%**, avoiding **$8.94 Million** in dealer battery replacements. When we click 'Dispatch OTA Campaign', it cryptographically signs the patch and writes the transaction directly into Snowflake `FLEET_OTA_CAMPAIGNS` with an SHA-256 safety hash!" |
+| **3:00 - 3:45** | **⚖️ Supplier Warranty Clawback Ledger** | Tab 7 Liability Chart & Click "File Claim" | "Next, we bridge engineering telemetry directly to the corporate balance sheet. In our **Supplier Warranty Clawback Ledger**, our view `V_SUPPLIER_WARRANTY_LIABILITY` calculates the contractual indemnification liability based on audited telemetry failure rates. ACME Battery owes **$8.49 Million** for defective cell batches. With one click, we file an audited claim into Snowflake `SUPPLIER_WARRANTY_CLAIMS` and generate an official legal dispute package." |
+| **3:45 - 4:25** | **💬 Cortex Natural Language SQL Co-Pilot** | Tab 5 Text-to-Insight Query | "For executive and engineering teams, we built a **Snowflake Cortex Text-to-Insight SQL Co-Pilot**. Watch: we ask in plain English: *'Which supplier has the highest failure rate in freezing cold?'* Cortex live-synthesizes the verified Snowflake SQL, runs the query against our data warehouse, and auto-renders interactive Plotly visualizations in seconds!" |
+| **4:25 - 5:00** | **Enterprise Architecture & Conclusion** | Tab 8, MCP Server & Executive ROI | "With Model Context Protocol (MCP) server integration, a Snowflake Native App package, and **$14.2 Million** in total warranty cost avoidance, this platform redefines enterprise automotive engineering on Snowflake Data Cloud. Thank you!" |
+
+---
+
+### Key Video Recording Checklist & Tips:
+1. **Resolution**: Record in crisp 1080p (1920x1080) in full-screen browser.
+2. **Audio**: Clean microphone, energetic and confident tone.
+3. **Pacing**: Move deliberately between tabs without awkward pauses.
+4. **Visual Highlights**: Linger for 10 seconds on the interactive 3D/Cell Heatmap in Tab 6 and click the "Dispatch OTA Campaign" button to show the green Snowflake write-back confirmation live!

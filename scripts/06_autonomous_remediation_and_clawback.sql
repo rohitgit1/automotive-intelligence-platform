@@ -1,0 +1,59 @@
+-- 06_autonomous_remediation_and_clawback.sql: Tables & Views for Closed-Loop OTA Remediation & Supplier Clawback
+USE WAREHOUSE AUTOMOTIVE_WH;
+USE DATABASE AUTOMOTIVE_INTELLIGENCE_DB;
+USE SCHEMA PUBLIC;
+
+-- 1. Table for Cryptographically Signed Autonomous OTA Firmware Campaigns
+CREATE TABLE IF NOT EXISTS FLEET_OTA_CAMPAIGNS (
+    CAMPAIGN_ID VARCHAR(64) PRIMARY KEY,
+    FIRMWARE_VERSION VARCHAR(64),
+    TARGET_SYSTEM VARCHAR(64),
+    TARGET_VIN_COUNT INT,
+    RISK_CRITERIA VARCHAR(256),
+    BMS_TUNING_PARAMETERS VARIANT,
+    PROJECTED_FAILURE_REDUCTION_PCT FLOAT,
+    PROJECTED_SAVINGS_USD FLOAT,
+    DEPLOYED_AT TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    DEPLOYED_BY VARCHAR(64),
+    SAFETY_HASH VARCHAR(128),
+    STATUS VARCHAR(32)
+);
+
+-- 2. Table for Supplier Warranty Liability Claims & Legal Dispute Invoices
+CREATE TABLE IF NOT EXISTS SUPPLIER_WARRANTY_CLAIMS (
+    CLAIM_ID VARCHAR(64) PRIMARY KEY,
+    SUPPLIER_NAME VARCHAR(128),
+    DEFECTIVE_COMPONENT VARCHAR(128),
+    AFFECTED_VIN_COUNT INT,
+    DTC_ERROR_CODE VARCHAR(32),
+    CORRELATED_ROOT_CAUSE VARCHAR(512),
+    WARRANTY_LIABILITY_USD FLOAT,
+    STATUS VARCHAR(32),
+    FILED_AT TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP(),
+    EVIDENCE_PAYLOAD VARIANT
+);
+
+-- 3. View: Real-Time Supplier Warranty Liability & Clawback Ledger
+CREATE OR REPLACE VIEW V_SUPPLIER_WARRANTY_LIABILITY AS
+SELECT 
+    bs.name AS SUPPLIER_NAME,
+    bt.name AS BATTERY_TYPE_NAME,
+    bc.cathode AS CATHODE_CHEMISTRY,
+    bc.anode AS ANODE_CHEMISTRY,
+    COUNT(DISTINCT v.vin) AS MONITORED_VEHICLES,
+    COUNT(CASE WHEN v.dtc_error_code IS NOT NULL AND v.dtc_error_code != 0 THEN 1 END) AS TOTAL_FAILURES,
+    ROUND(
+        COUNT(CASE WHEN v.dtc_error_code IS NOT NULL AND v.dtc_error_code != 0 THEN 1 END) * 100.0 / 
+        NULLIF(COUNT(*), 0), 2
+    ) AS INCIDENT_RATE_PCT,
+    -- Average dealer replacement cost per thermal/battery incident = $4,200
+    ROUND(COUNT(CASE WHEN v.dtc_error_code IS NOT NULL AND v.dtc_error_code != 0 THEN 1 END) * 4200.0, 2) AS TOTAL_WARRANTY_EXPOSURE_USD,
+    -- Contractual Supplier Clawback Rate (80% allocation for material/cell defect)
+    ROUND(COUNT(CASE WHEN v.dtc_error_code IS NOT NULL AND v.dtc_error_code != 0 THEN 1 END) * 4200.0 * 0.80, 2) AS ALLOCATED_SUPPLIER_CLAWBACK_USD
+FROM VEHICLES_ZIPCODES_DISTANCES_DATES_WEATHER_DTC v
+LEFT JOIN PART_BATTERY pb ON v.part_number = pb.part_number
+LEFT JOIN BATTERY_SUPPLIER bs ON pb.supplier = bs.id
+LEFT JOIN BATTERY_TYPE bt ON pb.type = bt.id
+LEFT JOIN BATTERY_COMPONENTS bc ON bt.id = bc.battery_type
+WHERE bs.name IS NOT NULL
+GROUP BY bs.name, bt.name, bc.cathode, bc.anode;
