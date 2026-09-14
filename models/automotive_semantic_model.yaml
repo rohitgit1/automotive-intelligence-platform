@@ -1,0 +1,97 @@
+name: automotive_intelligence_semantic_model
+description: Semantic model for vehicle telemetry quality analytics, battery cathode failure investigation, supplier warranty indemnification, and fleet OTA remediation.
+
+tables:
+  - name: V_ROOT_CAUSE_CORRELATION
+    description: Unified analytical view joining 300,000+ CAN-bus telemetry events with ambient weather, battery specifications, and DTC codes.
+    base_table:
+      database: AUTOMOTIVE_INTELLIGENCE_DB
+      schema: PUBLIC
+      table: V_ROOT_CAUSE_CORRELATION
+    dimensions:
+      - name: vin
+        type: VARCHAR
+        description: Vehicle Identification Number.
+        synonyms: ["vehicle", "car", "VIN"]
+      - name: supplier_name
+        type: VARCHAR
+        description: Battery cell manufacturing supplier name.
+        synonyms: ["supplier", "battery maker", "vendor"]
+      - name: battery_type_name
+        type: VARCHAR
+        description: Commercial battery model name.
+      - name: cathode
+        type: VARCHAR
+        description: Cathode chemical composition (e.g., Lithium Cobalt Oxide, NMC, LFP).
+        synonyms: ["cathode chemistry", "cell chemistry", "battery material"]
+      - name: anode
+        type: VARCHAR
+        description: Anode chemical composition (e.g., Synthetic Graphite, Silicon Blend).
+      - name: temperature_category
+        type: VARCHAR
+        description: Environmental temperature operating envelope (Extreme Cold <32F, Normal 32-85F, Extreme Heat >85F).
+        synonyms: ["weather condition", "thermal climate", "temperature band"]
+      - name: state
+        type: VARCHAR
+        description: US state where vehicle is operating.
+        synonyms: ["location", "region", "operating state"]
+      - name: error_code
+        type: VARCHAR
+        description: Standardized Diagnostic Trouble Code (DTC) identifier.
+        synonyms: ["fault code", "DTC", "error code"]
+      - name: error_description
+        type: VARCHAR
+        description: Engineering description of the diagnostic fault code.
+
+    measures:
+      - name: total_telemetry_events
+        expr: COUNT(*)
+        description: Total count of monitored CAN-bus telemetry transmissions.
+        synonyms: ["telemetry count", "total records", "pings"]
+      - name: total_failures
+        expr: COUNT(CASE WHEN dtc_error_code != 0 THEN 1 END)
+        description: Total observed diagnostic trouble code failure events.
+        synonyms: ["failure count", "defect count", "fault events", "breakdowns"]
+      - name: failure_rate_pct
+        expr: ROUND(COUNT(CASE WHEN dtc_error_code != 0 THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0), 2)
+        description: Diagnostic failure rate percentage.
+        synonyms: ["defect rate", "failure percentage", "incident rate"]
+      - name: avg_ambient_temp_f
+        expr: AVG(avg_temp_f)
+        description: Average ambient temperature in Fahrenheit during operation.
+
+  - name: V_SUPPLIER_WARRANTY_LIABILITY
+    description: Executive financial ledger quantifying warranty liabilities and contractual clawbacks by component supplier.
+    base_table:
+      database: AUTOMOTIVE_INTELLIGENCE_DB
+      schema: PUBLIC
+      table: V_SUPPLIER_WARRANTY_LIABILITY
+    dimensions:
+      - name: supplier_name
+        type: VARCHAR
+        description: Component supplier corporate name.
+      - name: cathode_chemistry
+        type: VARCHAR
+        description: Battery cathode material.
+    measures:
+      - name: total_warranty_exposure_usd
+        expr: SUM(total_warranty_exposure_usd)
+        description: Gross dealer warranty repair costs incurred by the OEM.
+        synonyms: ["total warranty cost", "repair exposure", "dealer replacement costs"]
+      - name: allocated_supplier_clawback_usd
+        expr: SUM(allocated_supplier_clawback_usd)
+        description: Statutory 80% defective component indemnification clawback due from the supplier.
+        synonyms: ["supplier liability", "indemnification demand", "clawback amount", "net recovery"]
+
+verified_queries:
+  - name: "Highest Defect Supplier"
+    question: "Which supplier has the highest DTC failure rate and total vehicle volume?"
+    sql: "SELECT supplier_name, COUNT(*) AS telemetry_count, COUNT(CASE WHEN dtc_error_code != 0 THEN 1 END) AS total_failures, ROUND(COUNT(CASE WHEN dtc_error_code != 0 THEN 1 END) * 100.0 / COUNT(*), 2) AS failure_rate_pct FROM V_ROOT_CAUSE_CORRELATION GROUP BY supplier_name ORDER BY failure_rate_pct DESC"
+
+  - name: "Cold Weather Cathode Failures"
+    question: "Compare failure rates across different cathode chemistries in sub-zero weather"
+    sql: "SELECT cathode, COUNT(*) AS records, COUNT(CASE WHEN dtc_error_code != 0 THEN 1 END) AS failures, ROUND(COUNT(CASE WHEN dtc_error_code != 0 THEN 1 END) * 100.0 / COUNT(*), 2) AS failure_rate_pct FROM V_ROOT_CAUSE_CORRELATION WHERE avg_temp_f < 32.0 GROUP BY cathode ORDER BY failure_rate_pct DESC"
+
+  - name: "Supplier Warranty Clawbacks"
+    question: "What is the total warranty exposure and allocated clawback amount for ACME Battery?"
+    sql: "SELECT supplier_name, total_warranty_exposure_usd, allocated_supplier_clawback_usd FROM V_SUPPLIER_WARRANTY_LIABILITY WHERE supplier_name ILIKE '%ACME%'"
