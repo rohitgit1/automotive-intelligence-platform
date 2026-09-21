@@ -421,7 +421,6 @@ with tab1:
                 """)
                 conn.commit()
                 cur.close()
-                conn.close()
                 load_fleet_metrics.clear()
                 load_daily_dtc_trend.clear()
                 st.toast("Injected 50 sub-zero CAN telemetry events into Snowflake!", icon="❄️")
@@ -556,7 +555,6 @@ with tab2:
                 cur.execute(search_sql)
                 raw_preview = cur.fetchone()[0]
                 cur.close()
-                conn.close()
                 parsed = json.loads(raw_preview)
                 search_bulletins = parsed.get("results", [])
             except Exception:
@@ -855,7 +853,6 @@ with tab4:
                 sp_res = cur.fetchone()[0]
                 conn.commit()
                 cur.close()
-                conn.close()
                 load_ota_campaigns.clear()
                 st.success(f"✅ Crisis Resolved Autonomously in 3.4 Seconds! {sp_res}")
             except Exception as e:
@@ -921,12 +918,12 @@ with tab5:
         "steps": [
             {"phase": "1. Intent & Planning Decomposition", "agent": "Snowflake Intelligence Master Orchestrator", "detail": "Parsed executive directive: 'Investigate P1794 failure on NMC811 battery packs and show supplier clawback'. Decomposing into multi-tool execution plan across dynamic tables, vector search, and stored procedures."},
             {"phase": "2. Cortex Search Tool Execution", "agent": "TSB Vector Knowledge Agent", "detail": "Retrieved 3 vector matches from DTC_BULLETIN_SEARCH_SERVICE using snowflake-arctic-embed-m-v1.5 embeddings."},
-            {"phase": "3. Cortex Analyst Semantic Model Query", "agent": "Warranty Clawback Agent", "detail": "Verified contract SLAs across 5 cell suppliers via automotive_semantic_model.yaml. Top debtor: ACME Battery ($25,482,240 clawback at 80% SLA)."}
+            {"phase": "3. Cortex Analyst Semantic Model Query", "agent": "Warranty Clawback Agent", "detail": "Verified contract SLAs across 5 cell suppliers via automotive_semantic_model.yaml. Top individual debtor: 123 Battery Manufacturers ($9,011,520 clawback). ACME Battery follows at $8,494,080. Combined fleet warranty exposure from Horizon Clean Room: $31,852,800."}
         ],
         "bulletins": [
             {"error_code": "P1794", "title": "TSB-BMS-2024-002: Sub-Zero Cold-Soak Cell Resistance Anomaly", "summary": "Diagnostic Code P1794: Battery Voltage Circuit Malfunction. Recommended Service Procedure: Deploy firmware patch to enable active PTC pack pre-heating (+12.5°C offset) and limit maximum DC fast charging C-rate to 0.45C until cell core reaches 5°C."}
         ],
-        "final_answer": "**Executive Briefing:** Our multi-agent investigation into the P1794 failure on NMC811 battery packs confirms that ACME Battery Energy Technologies is the primary debtor with 5,210 vehicles affected and $25,482,240 in allocated contractual clawback under our audited 80% defect indemnification SLA. TSB-BMS-2024-002 provides the corrective firmware parameters (PTC offset +12.5°C) to prevent cathode dendrite formation."
+        "final_answer": "**Executive Briefing:** Our multi-agent investigation into the P1794 failure on NMC811 battery packs confirms that 123 Battery Manufacturers is the top individual debtor at $9,011,520 in allocated clawback, followed by ACME Battery Energy Technologies at $8,494,080. Combined fleet warranty exposure across both defective suppliers totals $31,852,800 via the Horizon Clean Room audit. Autonomous OTA firmware patch v4.8.2-bms is available for deployment across 5,210 affected vehicles with TSB-BMS-2024-002 providing corrective PTC pre-heating parameters."
     }
 
     if "agent_trace" not in st.session_state:
@@ -1110,7 +1107,6 @@ with tab6:
                 elapsed_ms = (time.time() - t0) * 1000
                 results.append({"name": name, "target": target, "sql": sql, "status": "FAIL", "ms": elapsed_ms, "msg": str(e)})
         cur.close()
-        conn.close()
         return results
 
     if re_run_tests or "live_test_results" not in st.session_state:
@@ -1119,10 +1115,20 @@ with tab6:
 
     results = st.session_state["live_test_results"]
     
-    # Display Test Results cleanly
-    st.markdown("""
-    <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:14px 20px;margin-bottom:16px;">
-        <span style="color:#065f46;font-weight:700;font-size:15px;">🎉 6/6 CoCo Automated In-Engine Tests PASSED (100% Operational SLA Compliance)</span>
+    # Display Test Results cleanly — dynamic banner based on real results
+    pass_count = sum(1 for t in results if t["status"] == "PASS")
+    total_count = len(results)
+    if pass_count == total_count:
+        banner_bg, banner_border, banner_color = "#ecfdf5", "#a7f3d0", "#065f46"
+        banner_icon = "🎉"
+        banner_text = f"{pass_count}/{total_count} CoCo Automated In-Engine Tests PASSED (100% Operational SLA Compliance)"
+    else:
+        banner_bg, banner_border, banner_color = "#fffbeb", "#fde68a", "#92400e"
+        banner_icon = "⚠️"
+        banner_text = f"{pass_count}/{total_count} CoCo Automated In-Engine Tests PASSED ({total_count - pass_count} FAILED)"
+    st.markdown(f"""
+    <div style="background:{banner_bg};border:1px solid {banner_border};border-radius:12px;padding:14px 20px;margin-bottom:16px;">
+        <span style="color:{banner_color};font-weight:700;font-size:15px;">{banner_icon} {banner_text}</span>
     </div>
     """, unsafe_allow_html=True)
 

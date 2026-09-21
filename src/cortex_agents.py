@@ -562,10 +562,12 @@ class CortexAgentsEngine:
                         "warranty_exposure": float(r[5]),
                         "clawback_due": float(r[6])
                     })
+                # Data-driven top debtor identification
+                top_debtor = analyst_data[0] if analyst_data else {"supplier": "N/A", "clawback_due": 0}
                 trace["steps"].append({
                     "phase": "3. Cortex Analyst Semantic Model Query",
                     "agent": "Warranty Clawback Agent",
-                    "detail": f"Verified contract SLAs across {len(analyst_data)} cell suppliers via automotive_semantic_model.yaml. Top debtor: ACME Battery ($25,482,240 clawback at 80% SLA)."
+                    "detail": f"Verified contract SLAs across {len(analyst_data)} cell suppliers via automotive_semantic_model.yaml. Top debtor: {top_debtor['supplier']} (${top_debtor['clawback_due']:,.0f} clawback at 80% SLA)."
                 })
                 trace["data"] = analyst_data
             except Exception as e:
