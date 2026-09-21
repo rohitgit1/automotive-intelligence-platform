@@ -115,10 +115,10 @@ st.markdown("""
 
     /* Tab Header Styling */
     button[data-baseweb="tab"] {
-        font-size: 14px !important;
+        font-size: 13px !important;
         font-weight: 600 !important;
         color: #64748b !important;
-        padding: 12px 20px !important;
+        padding: 8px 12px !important;
         border-radius: 8px 8px 0 0 !important;
         background: transparent !important;
         border: none !important;
