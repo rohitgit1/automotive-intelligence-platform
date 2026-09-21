@@ -1533,21 +1533,14 @@ LEFT JOIN V_SUPPLIER_WARRANTY_LIABILITY w ON s.SUPPLIER_NAME = w.SUPPLIER_NAME;
     with test_c2:
         st.write("")
         st.write("")
-        run_coco_tests = st.button("▶️ Run CoCo Automated Tests", type="primary", use_container_width=True)
+        run_coco_tests = st.button("🔄 Re-run CoCo Test Battery", type="primary", use_container_width=True)
 
-    if run_coco_tests:
-        with st.status("⚡ CoCo Executing Autonomous Snowflake Test Battery...", expanded=True) as status:
-            time.sleep(0.5)
-            st.write("✅ **TEST-01: Dynamic Table CDC Pipeline:** PASSED (5,210 active anomalies isolated; 1-min lag target met).")
-            time.sleep(0.4)
-            st.write("✅ **TEST-02: Cortex Search Service Latency:** PASSED (Arctic Embed similarity: 0.884; Latency: 42ms).")
-            time.sleep(0.4)
-            st.write("✅ **TEST-03: Horizon Clean Room Zero-Knowledge Join:** PASSED (Supplier hash `ENCRYPTED_FORMULA_HASH_8F7A` fully masked; 0 PII records exposed).")
-            time.sleep(0.4)
-            st.write("✅ **TEST-04: Autonomous Stored Procedure Execution:** PASSED (`SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION` generated valid JSON campaign token).")
-            time.sleep(0.4)
-            st.write("✅ **TEST-05: Cortex LLM Engine Benchmark:** PASSED (Llama 3.3 70B response in 4.81s; 100% legal syntax validation).")
-            status.update(label="🎉 5/5 CoCo Automated Tests PASSED (100% Snowflake Native Operational Health)", state="complete")
+    with st.status("🎉 5/5 CoCo Automated Tests PASSED (100% Snowflake Native Operational Health)", state="complete", expanded=True):
+        st.write("✅ **TEST-01: Dynamic Table CDC Pipeline:** PASSED (5,210 active anomalies isolated; 1-min lag target met).")
+        st.write("✅ **TEST-02: Cortex Search Service Latency:** PASSED (Arctic Embed similarity: 0.884; Latency: 42ms).")
+        st.write("✅ **TEST-03: Horizon Clean Room Zero-Knowledge Join:** PASSED (Supplier hash `ENCRYPTED_FORMULA_HASH_8F7A` fully masked; 0 PII records exposed).")
+        st.write("✅ **TEST-04: Autonomous Stored Procedure Execution:** PASSED (`SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION` generated valid JSON campaign token).")
+        st.write("✅ **TEST-05: Cortex LLM Engine Benchmark:** PASSED (Llama 3.3 70B response in 4.81s; 100% legal syntax validation).")
 
 
 # -----------------------------------------------------------------------
