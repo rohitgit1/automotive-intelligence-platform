@@ -29,6 +29,10 @@ def deploy_sis():
     
     print("3. Uploading environment.yml...")
     cur.execute(f"PUT file://{env_file} @STREAMLIT_STAGE OVERWRITE=TRUE AUTO_COMPRESS=FALSE")
+
+    cortex_file = os.path.join(workspace_dir, "src", "cortex_agents.py").replace("\\", "/")
+    print("3b. Uploading cortex_agents.py...")
+    cur.execute(f"PUT file://{cortex_file} @STREAMLIT_STAGE OVERWRITE=TRUE AUTO_COMPRESS=FALSE")
     
     # 3. Create Streamlit in Snowflake Object
     print("4. Creating STREAMLIT object in Snowflake...")

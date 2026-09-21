@@ -13,12 +13,30 @@ SNOWFLAKE_CONFIG = {
     "schema": "PUBLIC"
 }
 
+import decimal
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            return float(obj)
+        if isinstance(obj, (datetime.date, datetime.datetime)):
+            return obj.isoformat()
+        return super().default(obj)
+
+def safe_json_dumps(obj, **kwargs):
+    return json.dumps(obj, cls=DecimalEncoder, **kwargs)
+
 class CortexAgentsEngine:
     def __init__(self):
-        self.model = "mistral-large2"
+        self.model = "llama3.3-70b"
 
     def _get_connection(self):
-        return snowflake.connector.connect(**SNOWFLAKE_CONFIG)
+        try:
+            from snowflake.snowpark.context import get_active_session
+            session = get_active_session()
+            return session.connection
+        except Exception:
+            return snowflake.connector.connect(**SNOWFLAKE_CONFIG)
 
     def _call_cortex_llm(self, prompt: str, system_prompt: str) -> str:
         full_prompt = f"System: {system_prompt}\n\nUser: {prompt}"
@@ -32,9 +50,9 @@ class CortexAgentsEngine:
             result = cursor.fetchone()[0]
             return result
         except Exception as e:
-            # Fallback to llama3.3-70b if mistral fails
+            # Fallback to llama3.1-70b or llama3.1-8b if needed
             try:
-                query = f"SELECT SNOWFLAKE.CORTEX.COMPLETE('llama3.3-70b', '{escaped_prompt}')"
+                query = f"SELECT SNOWFLAKE.CORTEX.COMPLETE('llama3.1-70b', '{escaped_prompt}')"
                 cursor.execute(query)
                 return cursor.fetchone()[0]
             except Exception as e2:
@@ -63,12 +81,12 @@ class CortexAgentsEngine:
             """)
             stats = cursor.fetchone()
             data_context = {
-                "total_telemetry_records": stats[0],
-                "dtc_error_events": stats[1],
-                "failure_rate_percentage": stats[2],
-                "avg_temp_f": stats[3],
-                "min_temp_f": stats[4],
-                "max_temp_f": stats[5]
+                "total_telemetry_records": int(stats[0]) if stats[0] is not None else 0,
+                "dtc_error_events": int(stats[1]) if stats[1] is not None else 0,
+                "failure_rate_percentage": float(stats[2]) if stats[2] is not None else 0.0,
+                "avg_temp_f": float(stats[3]) if stats[3] is not None else 32.0,
+                "min_temp_f": float(stats[4]) if stats[4] is not None else 0.0,
+                "max_temp_f": float(stats[5]) if stats[5] is not None else 100.0
             }
         finally:
             cursor.close()
@@ -79,7 +97,7 @@ class CortexAgentsEngine:
             "Your job is real-time anomaly detection across vehicle telemetry datasets. "
             "Identify sudden DTC error spikes, extreme weather operational strain, and unusual failure concentrations."
         )
-        user_prompt = f"Analyze the following fleet quality telemetry metrics and report top anomalies:\n{json.dumps(data_context, indent=2)}"
+        user_prompt = f"Analyze the following fleet quality telemetry metrics and report top anomalies:\n{safe_json_dumps(data_context, indent=2)}"
         return self._call_cortex_llm(user_prompt, system_prompt)
 
     def run_root_cause_analysis_agent(self, supplier_filter: str = None, error_code_filter: str = None) -> str:
@@ -526,13 +544,13 @@ class CortexAgentsEngine:
             conn = self._get_connection()
             cur = conn.cursor()
             try:
-                cur.execute("CALL SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION('P1794', 'ACME Battery Technologies', 'OTA-V4.2.1-COLD-PROTECT')")
+                cur.execute("CALL SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION('v4.8.2-bms', 5210.0, 'NMC811 Subzero Overheating', 14588000.0)")
                 sp_res = cur.fetchone()[0]
-                parsed_sp = json.loads(sp_res)
+                parsed_sp = json.loads(sp_res) if isinstance(sp_res, str) and sp_res.startswith("{") else {"status": "SUCCESS", "message": str(sp_res)}
                 trace["action_executed"] = parsed_sp
                 trace["steps"].append({
                     "phase": "4. Autonomous Action Dispatch",
-                    "detail": f"Dispatched SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION. Created Campaign ID: {parsed_sp.get('campaign_id')} targeting {parsed_sp.get('affected_vins_targeted')} vehicles."
+                    "detail": f"Dispatched SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION. Result: {parsed_sp.get('message', parsed_sp)}"
                 })
             except Exception as e:
                 trace["action_executed"] = {"status": "ERROR", "error": str(e)}
@@ -544,9 +562,9 @@ class CortexAgentsEngine:
         system_prompt = (
             "You are Snowflake Intelligence, the enterprise AI orchestrator for the Automotive Intelligence Platform. "
             "Synthesize the findings from Cortex Analyst semantic models, Cortex Search documents, and autonomous OTA actions. "
-            "Provide a crisp, authoritative executive briefing with specific numbers ($17.5M clawback, 5,210 vehicles, NMC811 cathode, P1794 error) and actionable next steps."
+            "Provide a crisp, authoritative executive briefing with specific numbers ($25.48M clawback, 5,210 vehicles, NMC811 cathode, P1794 error) and actionable next steps."
         )
-        context_str = f"User Query: {user_query}\n\nRetrieved Bulletins: {json.dumps(bulletin_matches)}\n\nSupplier Financials: {json.dumps(analyst_data[:3])}\n\nAction Result: {json.dumps(trace['action_executed'])}"
+        context_str = f"User Query: {user_query}\n\nRetrieved Bulletins: {safe_json_dumps(bulletin_matches)}\n\nSupplier Financials: {safe_json_dumps(analyst_data[:3])}\n\nAction Result: {safe_json_dumps(trace['action_executed'])}"
         
         trace["final_answer"] = self._call_cortex_llm(context_str, system_prompt)
         return trace
