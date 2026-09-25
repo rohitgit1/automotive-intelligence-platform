@@ -28,6 +28,23 @@ function App() {
 
   const triggerSnowflakeOTA = () => {
     setOtaStatus('detecting');
+
+    // Attempt live write-back to Snowflake Stored Procedure via REST Gateway
+    try {
+      fetch('http://localhost:8000/api/v1/ota/dispatch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firmware_version: 'v4.8.2-bms',
+          target_vin_count: 5210,
+          risk_criteria: 'NMC811 Subzero Overheating',
+          projected_savings_usd: 14588000.0
+        })
+      }).catch(() => {});
+    } catch {
+      // Non-blocking fallback
+    }
+
     setTimeout(() => {
       setOtaPayload({
         version: "v4.8.2-bms",

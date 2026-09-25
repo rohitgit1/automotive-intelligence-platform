@@ -1,0 +1,341 @@
+# Automotive Intelligence Platform - Semantic Model for Cortex Analyst
+# Used by AUTOMOTIVE_QUALITY_AGENT to answer structured data questions via SQL
+
+name: automotive_quality_analytics
+description: >
+  Semantic model for the Automotive Intelligence Platform. Covers fleet vehicle
+  telemetry, battery supplier quality metrics, warranty liability & clawback
+  analysis, DTC failure root cause correlation, and OTA remediation campaigns.
+  Use this model to answer questions about supplier defect rates, warranty
+  exposure, vehicle risk profiles, fleet health, and remediation status.
+
+tables:
+  - name: V_SUPPLIER_WARRANTY_LIABILITY
+    description: >
+      Supplier-level warranty liability and contractual clawback summary.
+      Shows each battery supplier's monitored vehicles, total failures,
+      incident rate, total warranty exposure in USD, and the allocated
+      supplier clawback amount at 80% SLA indemnification.
+    base_table:
+      database: AUTOMOTIVE_INTELLIGENCE_DB
+      schema: PUBLIC
+      table: V_SUPPLIER_WARRANTY_LIABILITY
+    dimensions:
+      - name: supplier_name
+        synonyms:
+          - supplier
+          - battery supplier
+          - vendor
+          - manufacturer
+        description: Name of the battery cell supplier
+        expr: SUPPLIER_NAME
+        data_type: VARCHAR
+      - name: battery_type_name
+        synonyms:
+          - battery type
+          - battery model
+        description: Battery product type or model name
+        expr: BATTERY_TYPE_NAME
+        data_type: VARCHAR
+      - name: cathode_chemistry
+        synonyms:
+          - cathode
+          - cathode type
+          - chemistry
+        description: Cathode chemistry composition (e.g. NMC811, LFP, CoO2)
+        expr: CATHODE_CHEMISTRY
+        data_type: VARCHAR
+      - name: anode_chemistry
+        synonyms:
+          - anode
+          - anode type
+        description: Anode chemistry composition
+        expr: ANODE_CHEMISTRY
+        data_type: VARCHAR
+    measures:
+      - name: monitored_vehicles
+        synonyms:
+          - vehicles monitored
+          - fleet size
+          - vehicle count
+        description: Number of vehicles being monitored for this supplier
+        expr: MONITORED_VEHICLES
+        data_type: NUMBER
+        default_aggregation: sum
+      - name: total_failures
+        synonyms:
+          - failures
+          - defects
+          - faults
+        description: Total number of DTC failure events for this supplier
+        expr: TOTAL_FAILURES
+        data_type: NUMBER
+        default_aggregation: sum
+      - name: incident_rate_pct
+        synonyms:
+          - failure rate
+          - defect rate
+          - incident rate
+        description: Percentage of vehicles with DTC failures
+        expr: INCIDENT_RATE_PCT
+        data_type: NUMBER
+        default_aggregation: avg
+      - name: total_warranty_exposure_usd
+        synonyms:
+          - warranty exposure
+          - warranty cost
+          - exposure
+          - total exposure
+        description: Total warranty exposure in US dollars
+        expr: TOTAL_WARRANTY_EXPOSURE_USD
+        data_type: NUMBER
+        default_aggregation: sum
+      - name: allocated_supplier_clawback_usd
+        synonyms:
+          - clawback
+          - clawback amount
+          - supplier clawback
+          - indemnification
+        description: Allocated supplier clawback amount at 80% SLA indemnification in USD
+        expr: ALLOCATED_SUPPLIER_CLAWBACK_USD
+        data_type: NUMBER
+        default_aggregation: sum
+
+  - name: V_SUPPLIER_QUALITY_METRICS
+    description: >
+      Supplier quality performance metrics including failure rates,
+      average operating temperatures, and distance driven statistics
+      broken down by battery type and cathode chemistry.
+    base_table:
+      database: AUTOMOTIVE_INTELLIGENCE_DB
+      schema: PUBLIC
+      table: V_SUPPLIER_QUALITY_METRICS
+    dimensions:
+      - name: supplier_name
+        synonyms:
+          - supplier
+          - vendor
+        description: Battery supplier name
+        expr: SUPPLIER_NAME
+        data_type: VARCHAR
+      - name: battery_type_name
+        description: Battery type designation
+        expr: BATTERY_TYPE_NAME
+        data_type: VARCHAR
+      - name: cathode
+        synonyms:
+          - cathode chemistry
+        description: Cathode chemistry
+        expr: CATHODE
+        data_type: VARCHAR
+      - name: anode
+        description: Anode chemistry
+        expr: ANODE
+        data_type: VARCHAR
+    measures:
+      - name: total_vehicles
+        synonyms:
+          - vehicle count
+          - fleet count
+        description: Total vehicles with this battery configuration
+        expr: TOTAL_VEHICLES
+        data_type: NUMBER
+        default_aggregation: sum
+      - name: total_dtc_errors
+        synonyms:
+          - dtc errors
+          - error count
+          - fault count
+        description: Total DTC error events
+        expr: TOTAL_DTC_ERRORS
+        data_type: NUMBER
+        default_aggregation: sum
+      - name: failure_rate_pct
+        synonyms:
+          - failure rate
+          - defect rate
+        description: Failure rate as a percentage
+        expr: FAILURE_RATE_PCT
+        data_type: NUMBER
+        default_aggregation: avg
+      - name: avg_operating_temp_f
+        synonyms:
+          - average temperature
+          - operating temperature
+        description: Average operating temperature in Fahrenheit
+        expr: AVG_OPERATING_TEMP_F
+        data_type: NUMBER
+        default_aggregation: avg
+
+  - name: V_VEHICLE_RISK_PROFILE
+    description: >
+      Individual vehicle risk assessment profiles with predicted risk tiers
+      (CRITICAL RISK, ELEVATED RISK, MODERATE RISK, LOW RISK) based on
+      historical DTC counts, operating temperatures, and supplier/chemistry data.
+    base_table:
+      database: AUTOMOTIVE_INTELLIGENCE_DB
+      schema: PUBLIC
+      table: V_VEHICLE_RISK_PROFILE
+    dimensions:
+      - name: car_id
+        description: Unique vehicle identifier
+        expr: CAR_ID
+        data_type: NUMBER
+      - name: vin
+        synonyms:
+          - vehicle identification number
+        description: Vehicle Identification Number
+        expr: VIN
+        data_type: VARCHAR
+      - name: model_year
+        synonyms:
+          - year
+        description: Vehicle model year
+        expr: MODEL_YEAR
+        data_type: NUMBER
+      - name: state
+        synonyms:
+          - location
+          - region
+        description: US state where vehicle is registered
+        expr: STATE
+        data_type: VARCHAR
+      - name: supplier_name
+        synonyms:
+          - supplier
+        description: Battery supplier name
+        expr: SUPPLIER_NAME
+        data_type: VARCHAR
+      - name: cathode
+        synonyms:
+          - cathode chemistry
+        description: Cathode chemistry of the battery
+        expr: CATHODE
+        data_type: VARCHAR
+      - name: predicted_risk_tier
+        synonyms:
+          - risk tier
+          - risk level
+          - risk category
+        description: ML-predicted risk tier (CRITICAL RISK, ELEVATED RISK, MODERATE RISK, LOW RISK)
+        expr: PREDICTED_RISK_TIER
+        data_type: VARCHAR
+    measures:
+      - name: historical_dtc_count
+        synonyms:
+          - dtc count
+          - error history
+          - fault history
+        description: Historical count of DTC error events for this vehicle
+        expr: HISTORICAL_DTC_COUNT
+        data_type: NUMBER
+        default_aggregation: sum
+      - name: avg_operating_temp
+        description: Average operating temperature
+        expr: AVG_OPERATING_TEMP
+        data_type: NUMBER
+        default_aggregation: avg
+
+  - name: FLEET_OTA_CAMPAIGNS
+    description: >
+      Audit ledger of all dispatched Over-The-Air (OTA) firmware remediation
+      campaigns. Tracks campaign IDs, firmware versions, target systems,
+      affected VINs, projected savings, deployment status, and SHA-256
+      safety verification hashes.
+    base_table:
+      database: AUTOMOTIVE_INTELLIGENCE_DB
+      schema: PUBLIC
+      table: FLEET_OTA_CAMPAIGNS
+    dimensions:
+      - name: campaign_id
+        synonyms:
+          - campaign
+          - ota campaign
+        description: Unique campaign identifier
+        expr: CAMPAIGN_ID
+        data_type: VARCHAR
+      - name: firmware_version
+        synonyms:
+          - firmware
+          - version
+          - patch
+        description: Firmware version deployed in this campaign
+        expr: FIRMWARE_VERSION
+        data_type: VARCHAR
+      - name: target_system
+        description: Target vehicle subsystem (e.g. BMS / Thermal Inverter)
+        expr: TARGET_SYSTEM
+        data_type: VARCHAR
+      - name: status
+        synonyms:
+          - campaign status
+          - deployment status
+        description: Campaign deployment status
+        expr: STATUS
+        data_type: VARCHAR
+      - name: safety_hash
+        description: SHA-256 cryptographic safety verification hash
+        expr: SAFETY_HASH
+        data_type: VARCHAR
+    measures:
+      - name: target_vin_count
+        synonyms:
+          - affected vehicles
+          - target vehicles
+        description: Number of VINs targeted by this OTA campaign
+        expr: TARGET_VIN_COUNT
+        data_type: NUMBER
+        default_aggregation: sum
+      - name: projected_savings_usd
+        synonyms:
+          - savings
+          - cost avoidance
+          - projected savings
+        description: Projected warranty cost savings in USD
+        expr: PROJECTED_SAVINGS_USD
+        data_type: FLOAT
+        default_aggregation: sum
+
+verified_queries:
+  - name: top_supplier_clawback
+    question: Which supplier has the highest warranty clawback?
+    verified_query: >
+      SELECT SUPPLIER_NAME, CATHODE_CHEMISTRY, MONITORED_VEHICLES,
+             TOTAL_FAILURES, INCIDENT_RATE_PCT,
+             TOTAL_WARRANTY_EXPOSURE_USD, ALLOCATED_SUPPLIER_CLAWBACK_USD
+      FROM V_SUPPLIER_WARRANTY_LIABILITY
+      ORDER BY ALLOCATED_SUPPLIER_CLAWBACK_USD DESC
+      LIMIT 5
+    verified_by: Platform Admin
+    verified_at: "2026-09-14"
+
+  - name: critical_risk_vehicles
+    question: How many vehicles are at critical risk?
+    verified_query: >
+      SELECT PREDICTED_RISK_TIER, COUNT(*) AS VEHICLE_COUNT
+      FROM V_VEHICLE_RISK_PROFILE
+      GROUP BY PREDICTED_RISK_TIER
+      ORDER BY VEHICLE_COUNT DESC
+    verified_by: Platform Admin
+    verified_at: "2026-09-14"
+
+  - name: supplier_failure_rates
+    question: What is the failure rate for each battery supplier?
+    verified_query: >
+      SELECT SUPPLIER_NAME, BATTERY_TYPE_NAME, CATHODE, TOTAL_VEHICLES,
+             TOTAL_DTC_ERRORS, FAILURE_RATE_PCT
+      FROM V_SUPPLIER_QUALITY_METRICS
+      ORDER BY FAILURE_RATE_PCT DESC
+    verified_by: Platform Admin
+    verified_at: "2026-09-14"
+
+  - name: ota_campaigns_deployed
+    question: What OTA campaigns have been deployed?
+    verified_query: >
+      SELECT CAMPAIGN_ID, FIRMWARE_VERSION, TARGET_SYSTEM,
+             TARGET_VIN_COUNT, PROJECTED_SAVINGS_USD, STATUS
+      FROM FLEET_OTA_CAMPAIGNS
+      ORDER BY DEPLOYED_AT DESC
+      LIMIT 10
+    verified_by: Platform Admin
+    verified_at: "2026-09-14"

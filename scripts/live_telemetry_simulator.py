@@ -39,11 +39,16 @@ def run_simulator():
     print("Starting Live Automotive Telemetry Simulator...")
     print("Targeting: VEHICLES_ZIPCODES_DISTANCES_DATES_WEATHER_DTC")
     
-    conn = snowflake.connector.connect(**SNOWFLAKE_CONFIG)
-    cur = conn.cursor()
+    conn = None
+    cur = None
     
-    try:
-        while True:
+    while True:
+        try:
+            if conn is None or conn.is_closed():
+                conn = snowflake.connector.connect(**SNOWFLAKE_CONFIG)
+                cur = conn.cursor()
+                print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Connected to Snowflake successfully.", flush=True)
+
             sql = """
             INSERT INTO VEHICLES_ZIPCODES_DISTANCES_DATES_WEATHER_DTC 
             (CAR_ID, VIN, MODEL_YEAR, VEHICLE_CONFIG, DOORS, STATE, STATE_AB, CITY, COUNTRY, 
@@ -72,14 +77,30 @@ def run_simulator():
             cur.executemany(sql, insert_data)
             conn.commit()
             
-            print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Injected {len(insert_data)} real-time sub-zero telemetry records (P1794 anomalies).")
-            time.sleep(3) 
+            print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Injected {len(insert_data)} real-time sub-zero telemetry records (P1794 anomalies).", flush=True)
+            time.sleep(3)
             
-    except KeyboardInterrupt:
-        print("\nSimulator stopped.")
-    finally:
-        cur.close()
-        conn.close()
+        except KeyboardInterrupt:
+            print("\nSimulator stopped by user.", flush=True)
+            break
+        except Exception as e:
+            print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Telemetry simulator connection error: {e}. Reconnecting in 5s...", flush=True)
+            if cur:
+                try: cur.close()
+                except Exception: pass
+            if conn:
+                try: conn.close()
+                except Exception: pass
+            conn = None
+            cur = None
+            time.sleep(5)
+            
+    if cur:
+        try: cur.close()
+        except Exception: pass
+    if conn:
+        try: conn.close()
+        except Exception: pass
 
 if __name__ == "__main__":
     run_simulator()

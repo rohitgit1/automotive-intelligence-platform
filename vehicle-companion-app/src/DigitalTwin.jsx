@@ -1,6 +1,6 @@
 import React, { useRef, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { OrbitControls, Environment, Float, Sparkles, MeshTransmissionMaterial } from '@react-three/drei'
+import { OrbitControls, Environment, Float, Sparkles } from '@react-three/drei'
 import * as THREE from 'three'
 
 // The core 3D battery object
@@ -30,9 +30,12 @@ function BatteryCore({ isCritical, otaStatus }) {
       
       if (isCritical && otaStatus === 'nominal') {
         speedMult = 4.0 // Erratic fast spinning when hot
-        group.current.rotation.x += Math.sin(state.clock.elapsedTime * 10) * 0.01 // shake
+        group.current.rotation.x = Math.sin(state.clock.elapsedTime * 15) * 0.04 // Vibration shake without drift
       } else if (otaStatus === 'receiving') {
         speedMult = 0.1 // Slow down for firmware flash
+        group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, 0, 0.1)
+      } else {
+        group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, 0, 0.1)
       }
       
       group.current.rotation.y += delta * baseSpeed * speedMult
