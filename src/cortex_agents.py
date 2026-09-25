@@ -5,9 +5,9 @@ import uuid
 import datetime
 
 SNOWFLAKE_CONFIG = {
-    "user": "SOUTHPAW21",
+    "user": "rohitishere",
     "password": "Vande@20345678",
-    "account": "qkxtana-ll44738",
+    "account": "bljohcq-fob95633",
     "warehouse": "AUTOMOTIVE_WH",
     "database": "AUTOMOTIVE_INTELLIGENCE_DB",
     "schema": "PUBLIC"

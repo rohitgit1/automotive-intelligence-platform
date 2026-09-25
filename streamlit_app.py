@@ -204,9 +204,9 @@ st.markdown("""
 # SNOWFLAKE CREDENTIALS & SESSION HANDLER
 # -----------------------------------------------------------------------
 SNOWFLAKE_CONFIG = {
-    "user": "SOUTHPAW21",
+    "user": "rohitishere",
     "password": "Vande@20345678",
-    "account": "qkxtana-ll44738",
+    "account": "bljohcq-fob95633",
     "warehouse": "AUTOMOTIVE_WH",
     "database": "AUTOMOTIVE_INTELLIGENCE_DB",
     "schema": "PUBLIC"
@@ -1281,7 +1281,7 @@ with tab5:
             """, unsafe_allow_html=True)
         with col_right_link:
             st.markdown("""
-            <a href="https://app.snowflake.com/qkxtana/ll44738/#/agent-studio" target="_blank" style="text-decoration:none;">
+            <a href="https://app.snowflake.com/bljohcq/fob95633/#/agent-studio" target="_blank" style="text-decoration:none;">
                 <div style="background:#0284c7;color:#ffffff;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;text-align:center;">
                     ↗ Open in Agent Studio
                 </div>
@@ -1751,7 +1751,7 @@ WHERE T.DTC_ERROR_CODE != 0
     $ irm https://ai.snowflake.com/install.ps1 | iex    # PowerShell
     
     # Connect CoCo with native schema awareness of AUTOMOTIVE_INTELLIGENCE_DB
-    $ coco login --account qkxtana-ll44738 --user SOUTHPAW21
+    $ coco login --account bljohcq-fob95633 --user rohitishere
     $ coco use database AUTOMOTIVE_INTELLIGENCE_DB schema PUBLIC
     
     # Scaffold continuous CDC pipelines and autonomous stored procedures

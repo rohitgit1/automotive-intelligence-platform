@@ -12,15 +12,15 @@ import requests
 sys.stdout.reconfigure(encoding='utf-8')
 
 SNOWFLAKE_CONFIG = {
-    "user": "SOUTHPAW21",
+    "user": "rohitishere",
     "password": "Vande@20345678",
-    "account": "qkxtana-ll44738",
+    "account": "bljohcq-fob95633",
     "warehouse": "AUTOMOTIVE_WH",
     "database": "AUTOMOTIVE_INTELLIGENCE_DB",
     "schema": "PUBLIC"
 }
 
-ACCOUNT_URL = "https://qkxtana-ll44738.snowflakecomputing.com"
+ACCOUNT_URL = "https://bljohcq-fob95633.snowflakecomputing.com"
 
 def deploy_agent():
     conn = snowflake.connector.connect(**SNOWFLAKE_CONFIG)

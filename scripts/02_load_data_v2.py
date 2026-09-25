@@ -1,10 +1,10 @@
 import snowflake.connector
 
 SNOWFLAKE_CONFIG = {
-    "user": "SOUTHPAW21",
+    "user": "rohitishere",
     "password": "Vande@20345678",
-    "account": "qkxtana-ll44738",
-    "warehouse": "COMPUTE_WH"
+    "account": "bljohcq-fob95633",
+    "warehouse": "AUTOMOTIVE_WH"
 }
 
 TABLE_SCHEMAS_AND_FILES = [
