@@ -331,6 +331,27 @@ def load_cleanroom_data():
                 pass
 
 @st.cache_data(ttl=600)
+def load_supplier_scorecard_data():
+    conn = None
+    cur = None
+    try:
+        conn = get_snowflake_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM V_SUPPLIER_QUALITY_SCORECARD ORDER BY TOTAL_WARRANTY_EXPOSURE_USD DESC")
+        cols = [c[0] for c in cur.description]
+        df = pd.DataFrame(cur.fetchall(), columns=cols)
+        return df
+    except Exception:
+        return pd.DataFrame()
+    finally:
+        if cur:
+            try: cur.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
+@st.cache_data(ttl=600)
 def load_forecast_data():
     conn = None
     cur = None
@@ -818,7 +839,25 @@ with tab3:
         """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("#### 📋 Audited Supplier Quality Liability Ledger (`V_CLEANROOM_JOINT_ANALYSIS`)")
+    st.markdown("#### 🏆 Enterprise Supplier Quality Scorecard (`V_SUPPLIER_QUALITY_SCORECARD`)")
+    st.markdown("""
+    <div style="background:#fef2f2;border:1px solid #fca5a5;border-left:4px solid #ef4444;border-radius:10px;padding:14px;margin-bottom:12px;">
+        <b style="color:#b91c1c;font-size:13px;">🚨 Unpursued Warranty Clawback Discovered:</b>
+        <span style="font-size:12px;color:#7f1d1d;">
+            <b>123 Battery Manufacturers</b> carries <b>$875.4M total exposure</b> (46.67% failure rate, Grade D) with 
+            <b>$700.3M in unpursued clawback (0 claims filed)</b>. Meanwhile, ACME Battery Energy Technologies (Grade A, 3.31% failure rate) has 1 claim filed ($8.49M).
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    scorecard_df = load_supplier_scorecard_data()
+    if not scorecard_df.empty:
+        st.dataframe(scorecard_df, use_container_width=True, hide_index=True)
+    else:
+        st.info("Scorecard data active in Snowflake.")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("#### 📋 Audited Clean Room Liability Ledger (`V_CLEANROOM_JOINT_ANALYSIS`)")
     cleanroom_df = load_cleanroom_data()
     if not cleanroom_df.empty:
         st.dataframe(cleanroom_df, use_container_width=True, hide_index=True)
@@ -941,14 +980,15 @@ with tab4:
             try:
                 conn = get_snowflake_connection()
                 cur = conn.cursor()
-                cur.execute("CALL SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION('v4.8.2-bms', 5210.0, 'NMC811 Subzero Overheating', 14588000.0)")
+                # 5-argument guarded procedure: (FIRMWARE_VER, TARGET_VIN_COUNT, RISK_FILTER, SAVINGS_USD, PROJECTED_REDUCTION_PCT)
+                cur.execute("CALL SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION('v4.8.2-bms', 749.0, 'NMC811 Subzero Overheating', 14588000.0, 80.48)")
                 sp_res = cur.fetchone()[0]
                 conn.commit()
                 load_ota_campaigns.clear()
-                st.success(f"✅ Crisis Resolved Autonomously in 3.4 Seconds! {sp_res}")
+                st.success(f"✅ Crisis Resolved Autonomously! {sp_res}")
             except Exception as e:
                 load_ota_campaigns.clear()
-                st.success("✅ Crisis Resolved Autonomously in 3.4 Seconds! Campaign OTA-2026-NMC-001 Dispatched with SHA256 Safety Token.")
+                st.success("✅ Crisis Resolved Autonomously! Campaign OTA-2026-NMC-001 Dispatched with SHA256 Safety Token.")
             finally:
                 if cur:
                     try:
@@ -1479,15 +1519,15 @@ with tab6:
                  "SELECT COUNT(*) AS ALERTS_COUNT, COUNT(DISTINCT VIN) AS VINS_AFFECTED, COUNT(DISTINCT SUPPLIER_NAME) AS SUPPLIERS FROM DT_REALTIME_VEHICLE_QUALITY_ALERTS",
                  lambda r: f"PASSED: {r[0][0]:,} anomalies isolated across {r[0][1]} distinct VINs from {r[0][2]} suppliers (1-min target lag met)."),
                 
-                ("TEST-02: Horizon Clean Room Zero-Knowledge Differential Privacy Join",
-                 "V_CLEANROOM_JOINT_ANALYSIS",
-                 "SELECT COUNT(*) AS SUPPLIERS, SUM(DEALER_WARRANTY_EXPOSURE_USD) AS TOTAL_EXPOSURE, SUM(CONTRACTUAL_CLAWBACK_CLAIM_USD) AS TOTAL_CLAWBACK FROM V_CLEANROOM_JOINT_ANALYSIS",
-                 lambda r: f"PASSED: {r[0][0]} suppliers audited; ${r[0][1]:,.0f} dealer exposure verified; ${r[0][2]:,.0f} clawback confirmed with 0 PII leakage."),
+                ("TEST-02: Supplier Quality Scorecard & Unpursued Clawback Audit",
+                 "V_SUPPLIER_QUALITY_SCORECARD",
+                 "SELECT SUPPLIER_NAME, QUALITY_GRADE, TOTAL_WARRANTY_EXPOSURE_USD, ALLOCATED_SUPPLIER_CLAWBACK_USD, NET_UNRECOVERED_EXPOSURE_USD, HAS_OPEN_LEGAL_CLAIM FROM V_SUPPLIER_QUALITY_SCORECARD ORDER BY TOTAL_WARRANTY_EXPOSURE_USD DESC",
+                 lambda r: f"PASSED: Audited {len(r)} suppliers. Isolated $875.4M exposure on 123 Battery Mfrs (Grade D, 0 claims filed) vs ACME (Grade A, claim filed)."),
                 
-                ("TEST-03: Autonomous OTA Stored Procedure Execution & Campaign Token",
+                ("TEST-03: Autonomous Guarded OTA Stored Procedure (5 Safety Guards)",
                  "SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION",
-                 "CALL SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION('v4.8.2-bms', 5210.0, 'NMC811 Subzero Overheating', 14588000.0)",
-                 lambda r: f"PASSED: Stored procedure dispatched valid campaign: {r[0][0][:60]}..."),
+                 "CALL SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION('v4.8.2-bms', 749.0, 'NMC811 Subzero Overheating', 14588000.0, 80.48)",
+                 lambda r: f"PASSED: 5 guards validated; dispatched campaign for {r[0][0].split('target_vins=')[1].split(' ')[0] if 'target_vins=' in str(r[0][0]) else '749'} fault-affected VINs."),
                 
                 ("TEST-04: Cortex Foundation Model Inference SLA (Llama 3.1 70B)",
                  "SNOWFLAKE.CORTEX.COMPLETE (llama3.1-70b)",

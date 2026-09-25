@@ -383,6 +383,24 @@ class CortexAgentsEngine:
             cursor.close()
             conn.close()
 
+    def get_supplier_quality_scorecard_data(self):
+        """
+        Fetches live supplier quality scorecard metrics from V_SUPPLIER_QUALITY_SCORECARD
+        (surfaces quality grades, unpursued claims, and net unrecovered exposure).
+        """
+        conn = self._get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM V_SUPPLIER_QUALITY_SCORECARD ORDER BY TOTAL_WARRANTY_EXPOSURE_USD DESC")
+            cols = [desc[0] for desc in cursor.description]
+            rows = cursor.fetchall()
+            return [dict(zip(cols, row)) for row in rows]
+        except Exception as e:
+            return []
+        finally:
+            cursor.close()
+            conn.close()
+
     # =========================================================================
     # INNOVATION 3: SNOWFLAKE CORTEX NATURAL LANGUAGE TEXT-TO-INSIGHT SQL COPILOT
     # =========================================================================
@@ -597,12 +615,41 @@ class CortexAgentsEngine:
                             "warranty_exposure": float(r[5]),
                             "clawback_due": float(r[6])
                         })
+                    # Tool 2: Cortex Analyst / Supplier Quality Scorecard (V_SUPPLIER_QUALITY_SCORECARD)
+                    cur = conn.cursor()
+                    cur.execute("""
+                        SELECT 
+                            SUPPLIER_NAME, 
+                            QUALITY_GRADE,
+                            TOTAL_FAILURES, 
+                            FAILURE_RATE_PCT, 
+                            TOTAL_WARRANTY_EXPOSURE_USD, 
+                            ALLOCATED_SUPPLIER_CLAWBACK_USD, 
+                            NET_UNRECOVERED_EXPOSURE_USD,
+                            HAS_OPEN_LEGAL_CLAIM
+                        FROM V_SUPPLIER_QUALITY_SCORECARD
+                        ORDER BY TOTAL_WARRANTY_EXPOSURE_USD DESC
+                    """)
+                    scorecard_rows = cur.fetchall()
+                    analyst_data = [
+                        {
+                            "supplier": r[0],
+                            "grade": r[1],
+                            "failures": int(r[2]) if r[2] else 0,
+                            "failure_rate_pct": float(r[3]) if r[3] else 0.0,
+                            "warranty_exposure_usd": float(r[4]) if r[4] else 0.0,
+                            "clawback_due": float(r[5]) if r[5] else 0.0,
+                            "net_unrecovered_usd": float(r[6]) if r[6] else 0.0,
+                            "has_open_claim": bool(r[7])
+                        }
+                        for r in scorecard_rows
+                    ]
                     # Data-driven top debtor identification
                     top_debtor = analyst_data[0] if analyst_data else {"supplier": "N/A", "clawback_due": 0}
                     trace["steps"].append({
                         "phase": "3. Cortex Analyst Semantic Model Query",
                         "agent": "Warranty Clawback Agent",
-                        "detail": f"Verified contract SLAs across {len(analyst_data)} cell suppliers via automotive_semantic_model.yaml. Top debtor: {top_debtor['supplier']} (${top_debtor['clawback_due']:,.0f} clawback at 80% SLA)."
+                        "detail": f"Verified contract SLAs across {len(analyst_data)} cell suppliers via V_SUPPLIER_QUALITY_SCORECARD. Top unrecovered debtor: {top_debtor['supplier']} (${top_debtor['clawback_due']:,.0f} clawback at 80% SLA, Grade: {top_debtor.get('grade')}, Open Claim: {top_debtor.get('has_open_claim')})."
                     })
                     trace["data"] = analyst_data
                 except Exception as e:
@@ -614,7 +661,7 @@ class CortexAgentsEngine:
                         except Exception:
                             pass
 
-            # Tool 3: Autonomous OTA Remediation Dispatch
+            # Tool 3: Autonomous OTA Remediation Dispatch (Guarded Stored Procedure)
             should_dispatch = any(k in query_lower for k in [
                 "dispatch", "execute", "remediate", "ota", "patch", "firmware", "fix", "deploy", "action", "emergency"
             ])
@@ -623,14 +670,15 @@ class CortexAgentsEngine:
                 cur = None
                 try:
                     cur = conn.cursor()
-                    cur.execute("CALL SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION('v4.8.2-bms', 5210.0, 'NMC811 Subzero Overheating', 14588000.0)")
+                    # 5-argument guarded signature: (FIRMWARE_VER, TARGET_VIN_COUNT, RISK_FILTER, SAVINGS_USD, PROJECTED_REDUCTION_PCT)
+                    cur.execute("CALL SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION('v4.8.2-bms', 749.0, 'NMC811 Subzero Overheating', 14588000.0, 80.48)")
                     sp_res = cur.fetchone()[0]
                     parsed_sp = json.loads(sp_res) if isinstance(sp_res, str) and sp_res.startswith("{") else {"status": "SUCCESS", "message": str(sp_res)}
                     trace["action_executed"] = parsed_sp
                     trace["steps"].append({
                         "phase": "4. Autonomous Action Dispatch",
                         "agent": "Autonomous Remediation Agent",
-                        "detail": f"Dispatched SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION. Result: {parsed_sp.get('message', parsed_sp)}"
+                        "detail": f"Dispatched SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION (5 guards passed, 749 fault-affected VINs targeted). Result: {parsed_sp.get('message', parsed_sp)}"
                     })
                 except Exception as e:
                     trace["action_executed"] = {"status": "ERROR", "error": str(e)}

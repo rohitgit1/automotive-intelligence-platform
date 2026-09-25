@@ -87,29 +87,50 @@ Built entirely natively on the **Snowflake Data Cloud**, the platform establishe
 ## 🌟 Key Innovations & Deliverables
 
 ### 1. Snowflake Native Agent (`AUTOMOTIVE_QUALITY_AGENT`)
-- **Published in Snowflake Agent Studio** (`Version 2 - Serving Traffic`).
-- Direct integration with **Snowflake Cortex Search** for technical bulletins and Diagnostic Trouble Codes (e.g. DTC P1794 battery circuit failure).
+- **Published in Snowflake Agent Studio** (`VERSION$4 - Serving Live Traffic`).
+- **Complete 7-Tool Agentic Suite:**
+  1. `automotive_analyst` (`cortex_analyst_text_to_sql`): 13 database objects, 23 Verified Query Repositories (VQRs) over `AUTOMOTIVE_QUALITY_ANALYTICS`.
+  2. `dtc_bulletin_search` (`cortex_search`): Technical engineering bulletins & diagnostic trouble code remediation procedures via `DTC_BULLETIN_SEARCH_SERVICE`.
+  3. `compliance_remediation_search` (`cortex_search`): Regulatory, NHTSA, and OEM compliance documentation via `COMPLIANCE_REMEDIATION_SEARCH_SERVICE`.
+  4. `data_to_chart`: Dynamic chart and visualization generation.
+  5. `code_execution`: Python & SQL sandboxed execution environment.
+  6. `incident_triage` (`generic`): Automated incident root-cause triage via `SP_AI_INCIDENT_TRIAGE`.
+  7. `ota_dispatch` (`generic`): Guarded campaign writes via `SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION` with caller-justified efficacy verification.
 - Structured reasoning schema with internal thinking trace, live citation badges, and automated follow-up question synthesis.
 - Programmatically invokable via Snowflake's official REST API endpoint:
   ```
   POST /api/v2/databases/AUTOMOTIVE_INTELLIGENCE_DB/schemas/PUBLIC/agents/AUTOMOTIVE_QUALITY_AGENT:run
   ```
 
-### 2. Horizon Clean Room & Supplier Warranty Recovery
-- Demonstrates Snowflake Horizon differential privacy joins between OEM telematics and tier-1 battery cell suppliers (e.g. ACME Battery Energy Technologies).
-- Audited **$25,482,240** in contractual clawback claims across 5,210 affected vehicles under the 80% supplier defect indemnification SLA with zero PII leakage.
+### 2. Horizon Clean Room, Supplier Quality Scorecards & Warranty Clawback
+- **`V_SUPPLIER_QUALITY_SCORECARD`**: Live consolidated supplier scorecard joining telemetry metrics, defect rates, warranty liability, letter grades, and contractual legal claims.
+  - Exposes critical enterprise finding: **`123 Battery Manufacturers`** carries **$875.4M** in total warranty exposure with a **46.67% failure rate (Grade D)** and **$175.1M net unrecovered exposure** with zero claims filed ($700.3M unpursued recovery).
+  - Contrasted with **`ACME Battery Energy Technologies`** (Grade A, 3.31% failure rate) with legal claim `CLM-WARN-EDCB296F` filed.
+- Demonstrates Snowflake Horizon differential privacy joins between OEM telematics and tier-1 battery cell suppliers with zero PII leakage.
 
-### 3. Real-Time Dynamic Tables CDC Pipeline
-- `DT_REALTIME_VEHICLE_QUALITY_ALERTS` operates with a continuous **1-minute target lag**.
-- Automatically isolates sub-zero cold-soak (<32°F) cathode impedance spikes and correlates them across battery chemistry lots (`NMC811` vs. `LFP`).
+### 3. Real-Time Dynamic Tables CDC Pipeline & Telemetry Truth
+- Real telemetry engine across `VEHICLES_ZIPCODES_DISTANCES_DATES_WEATHER_DTC` (474,033 rows) + `DT_REALTIME_VEHICLE_QUALITY_ALERTS` (210,964 rows).
+- **Critical Telemetry Fact:** `DTC_ERROR_CODE = 0` denotes healthy telemetry (506,970 records). Only codes 1–6 are true mapped faults (5,210 records across 749 distinct VINs).
+- **100% of mapped DTC faults occur in extreme cold (<32°F / 0°C)** across sub-zero cold-soak conditions.
+- `DT_REALTIME_VEHICLE_QUALITY_ALERTS` operates with a continuous **1-minute target lag** isolating cathode impedance spikes across battery lots (`NMC811` vs. `LFP`).
 
-### 4. Interactive 3D WebGL Digital Twin (Three.js + React 19)
+### 4. Guarded Autonomous OTA Remediation (`SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION`)
+- Hardened 5-parameter procedure logging directly to `FLEET_OTA_CAMPAIGNS`:
+  - `FIRMWARE_VER`, `TARGET_VIN_COUNT`, `RISK_FILTER`, `SAVINGS_USD`, `PROJECTED_REDUCTION_PCT`.
+- Enforces 5 enterprise safety guards:
+  - Guard 1: Mandatory justified efficacy projection (`PROJECTED_REDUCTION_PCT` between 0% and 100%).
+  - Guard 2: Target VIN count bounded to true fault population (<= 750 VINs).
+  - Guard 3: Strict positive non-zero vehicle counts.
+  - Guard 4: Non-negative cost savings validation.
+  - Guard 5: Duplicate active firmware campaign rejection.
+
+### 5. Interactive 3D WebGL Digital Twin (Three.js + React 19)
 - Visualizes 96 prismatic lithium-ion cells across 16 structural modules.
 - Dynamic thermal color interpolation (safe green to critical 58°C thermal runaway red).
 - Live OTA deployment terminal rendering binary patch transfers and PTC heater offset activations.
 - **Hosted live at:** [https://rohitgit1.github.io/automotive-intelligence-platform/](https://rohitgit1.github.io/automotive-intelligence-platform/)
 
-### 5. Multi-Model Swarm & CoCo Deep Integration
+### 6. Multi-Model Swarm & CoCo Deep Integration
 - Parallel benchmark arena executing across 5 distinct Snowflake Cortex engines:
   1. `llama3.1-70b` (Deep multi-agent reasoning)
   2. `llama3.1-8b` (Sub-second low-latency inference)
