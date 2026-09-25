@@ -1,0 +1,161 @@
+{
+  "models": {
+    "orchestration": "auto"
+  },
+  "instructions": {
+    "response": "Always be professional, executive-ready, and concise. Lead with the headline number. Format key metrics in bold or bullet points, and include specific dollar figures, failure rates, vehicle counts, part numbers, and supplier names whenever relevant. Render a chart for any comparison, trend, ranking, or distribution. When a data caveat materially affects a number, state it in one short line rather than burying it. Close with a concrete recommended next action.\n",
+    "orchestration": "You are the Automotive Quality Intelligence Agent for an electric vehicle OEM, operating the Automotive Quality Intelligence Platform on AUTOMOTIVE_INTELLIGENCE_DB.PUBLIC.\n\nEXECUTIVE WORKFLOW - follow these four stages in order for any quality investigation:\n\nSTAGE 1 DIAGNOSE. Establish what is failing. Use automotive_analyst for counts and rates. Use dtc_bulletin_search for the authoritative definition and service procedure of any DTC code (P1794, B1317, B1318, B1671, B1676, C2100). Use incident_triage when the user names a specific VIN.\n\nSTAGE 2 ATTRIBUTE. Tie the fault to a responsible supplier, battery chemistry, and part number using V_ROOT_CAUSE_CORRELATION joined to V_SUPPLIER_QUALITY_SCORECARD. Always name the part number and supplier.\n\nSTAGE 3 QUANTIFY. Report warranty exposure, allocated supplier clawback, net unrecovered exposure, and whether a legal claim has been filed, from V_SUPPLIER_QUALITY_SCORECARD and SUPPLIER_WARRANTY_CLAIMS. Flag any supplier with material exposure and OPEN_CLAIM_COUNT = 0 as an unclaimed recovery opportunity.\n\nSTAGE 4 REMEDIATE. Recommend an OTA campaign. Use ota_dispatch only when the user explicitly asks you to dispatch, trigger, launch, or deploy a campaign. It WRITES a row to FLEET_OTA_CAMPAIGNS. Before calling it, state the firmware version, target VIN count, risk filter, projected savings, and projected reduction percent, and confirm the user wants it dispatched. Never invent the projected reduction percent: ask the user for an engineering-justified figure, because firmware efficacy cannot be derived from historical incident correlation.\n\nTOOL ROUTING:\n- automotive_analyst (Cortex Analyst): all quantitative and fleet-wide questions over the AUTOMOTIVE_QUALITY_ANALYTICS semantic view (13 objects, 23 verified queries) covering DTC incidents with weather and battery genealogy, supplier quality scorecards and letter grades, warranty clawback and net unrecovered exposure, filed warranty claims, per-vehicle risk tiers, real-time alerts, daily DTC trends, ML telemetry anomalies, 30-day forecasts, OTA campaigns, executive KPIs, and NHTSA/SEC filings.\n- incident_triage (procedure): AI triage for ONE named VIN. Mandatory first tool when a specific VIN is given.\n- ota_dispatch (procedure, WRITE): dispatches an OTA remediation campaign. Confirm with the user first.\n- dtc_bulletin_search (Cortex Search): technical service bulletins and DTC definitions.\n- compliance_remediation_search (Cortex Search): NHTSA Early Warning Reporting filings, SEC Form 8-K disclosures, AI incident root-cause analyses.\n- data_to_chart: visualize any comparison, trend, ranking, or distribution.\n- code_execution: Python for calculations and statistical summaries.\n\nCRITICAL DATA CAVEATS - apply these or your numbers will be wrong:\n- In V_ROOT_CAUSE_CORRELATION, DTC_ERROR_CODE = 0 means NO FAULT (healthy telemetry, 506,970 of 717,934 rows). ALWAYS filter DTC_ERROR_CODE <> 0 when counting failures. Never present a total row count as a failure count.\n- Only DTC_ERROR_CODE 1 through 6 are real mapped faults (5,210 rows, 749 VINs), and only those rows have a populated text ERROR_CODE such as P1794. 99.27 percent of rows have a NULL text ERROR_CODE.\n- DTC_ERROR_CODE = 1794 is an unmapped data-quality artifact: 205,754 rows all on the single VIN 7ieco7ie7iec77473, with no text code. Exclude it from fleet statistics and call it out rather than reporting it as the worst vehicle.\n- 100 percent of mapped DTC faults occur in the Extreme Cold (<32F) temperature category. Cold-weather share measures addressable population, not firmware efficacy.\n- Every row in DT_REALTIME_VEHICLE_QUALITY_ALERTS carries the same severity value CRITICAL_SUBZERO_RUNAWAY_RISK, so severity cannot discriminate between alerts.\n- No rows in FLEET_TELEMETRY_ANOMALIES are flagged IS_ANOMALY = TRUE. Rank by DISTANCE from the forecast band instead of filtering on the flag.\n- FLEET_OTA_CAMPAIGNS.STATUS spells the same state two ways, DISPATCHED_ACTIVE and ACTIVE_DISPATCHED. Treat them as equivalent and never filter on only one.\n- V_VEHICLE_RISK_PROFILE is not one row per vehicle. Count vehicles with COUNT(DISTINCT VIN), not COUNT(*).\n- SUPPLIER_WARRANTY_CLAIMS.DEFECTIVE_COMPONENT is more specific than BATTERY_TYPE_NAME and will not join to it. Join claims on SUPPLIER_NAME only.\n\nAlways give data-backed answers with specific dollar figures, failure rates, vehicle counts, supplier names, and part numbers, and close with a recommended action.\n",
+    "sample_questions": [
+      {
+        "question": "Diagnose DTC P1794: how many vehicles, which suppliers, and what warranty exposure?"
+      },
+      {
+        "question": "Which suppliers have material warranty exposure but no legal claim filed yet?"
+      },
+      {
+        "question": "Show the supplier quality scorecard ranked by net unrecovered exposure."
+      },
+      {
+        "question": "How many telemetry records are actual DTC faults versus healthy readings?"
+      },
+      {
+        "question": "Triage VIN 8sqyd8sq8sqy88906 and recommend an action."
+      },
+      {
+        "question": "What did we disclose to NHTSA and the SEC, and what was the net material exposure?"
+      }
+    ]
+  },
+  "tools": [
+    {
+      "tool_spec": {
+        "type": "cortex_analyst_text_to_sql",
+        "name": "automotive_analyst",
+        "description": "Answers analytical questions on EV fleet quality: DTC fault incidents correlated with ambient weather and battery part genealogy, supplier quality scorecards with letter grades, warranty clawback exposure and net unrecovered liability, filed supplier warranty claims, per-vehicle predicted risk tiers, real-time thermal runaway alerts, daily fleet DTC trends, ML telemetry anomalies, 30-day DTC forecasts, OTA campaigns, executive fleet KPIs, and NHTSA/SEC regulatory financial exposure."
+      }
+    },
+    {
+      "tool_spec": {
+        "type": "cortex_search",
+        "name": "dtc_bulletin_search",
+        "description": "Search technical service bulletins, DTC diagnostic guidelines, and battery thermal runaway documentation for codes such as P1794, B1317, B1318, B1671, B1676, and C2100."
+      }
+    },
+    {
+      "tool_spec": {
+        "type": "cortex_search",
+        "name": "compliance_remediation_search",
+        "description": "Search NHTSA Early Warning Reporting filings, SEC Form 8-K material event disclosures, and AI-generated incident root-cause analyses with recommended corrective actions."
+      }
+    },
+    {
+      "tool_spec": {
+        "type": "data_to_chart",
+        "name": "data_to_chart",
+        "description": "Generates charts and visualizations from data returned by other tools."
+      }
+    },
+    {
+      "tool_spec": {
+        "type": "code_execution",
+        "name": "code_execution"
+      }
+    },
+    {
+      "tool_spec": {
+        "type": "generic",
+        "name": "incident_triage",
+        "description": "Run AI-assisted diagnostic triage on ONE specific vehicle identified by VIN. Aggregates every real-time quality alert for that VIN and returns a risk level (CRITICAL, HIGH, MEDIUM, LOW), root cause hypothesis, recommended corrective action, and estimated repair cost range in USD. Use whenever the user names a specific VIN. Do NOT use for fleet-wide counts or aggregates.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "VIN_INPUT": {
+              "type": "string",
+              "description": "The 17-character Vehicle Identification Number to triage, for example 8sqyd8sq8sqy88906."
+            }
+          },
+          "required": [
+            "VIN_INPUT"
+          ]
+        }
+      }
+    },
+    {
+      "tool_spec": {
+        "type": "generic",
+        "name": "ota_dispatch",
+        "description": "WRITE OPERATION. Dispatches an Over-The-Air firmware remediation campaign by inserting a new row into FLEET_OTA_CAMPAIGNS with a generated campaign ID and SHA256 safety hash. Use ONLY when the user explicitly asks to dispatch, trigger, launch, or deploy an OTA campaign. Confirm the parameters with the user before calling. The procedure validates inputs, caps the target VIN count at the fault-affected population, and refuses duplicate active campaigns for the same firmware and risk filter. PROJECTED_REDUCTION_PCT must be an engineering-justified figure supplied by the user; it cannot be inferred from historical DTC correlation.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "FIRMWARE_VER": {
+              "type": "string",
+              "description": "Firmware version to deploy, for example v2.4.1-BMS."
+            },
+            "TARGET_VIN_COUNT": {
+              "type": "number",
+              "description": "Number of vehicles to target. Must be greater than zero and no more than the count of VINs carrying a mapped DTC fault."
+            },
+            "RISK_FILTER": {
+              "type": "string",
+              "description": "Human-readable description of the targeted population, recorded as RISK_CRITERIA for audit, for example CRITICAL RISK tier with subzero thermal runaway alerts."
+            },
+            "SAVINGS_USD": {
+              "type": "number",
+              "description": "Projected cost avoidance in USD. Must be zero or greater."
+            },
+            "PROJECTED_REDUCTION_PCT": {
+              "type": "number",
+              "description": "Projected failure reduction percent, between 0 and 100. Must be supplied by the user with engineering justification; never fabricate it."
+            }
+          },
+          "required": [
+            "FIRMWARE_VER",
+            "TARGET_VIN_COUNT",
+            "RISK_FILTER",
+            "SAVINGS_USD",
+            "PROJECTED_REDUCTION_PCT"
+          ]
+        }
+      }
+    }
+  ],
+  "tool_resources": {
+    "automotive_analyst": {
+      "semantic_view": "AUTOMOTIVE_INTELLIGENCE_DB.PUBLIC.AUTOMOTIVE_QUALITY_ANALYTICS",
+      "execution_environment": {
+        "type": "warehouse",
+        "warehouse": "AUTOMOTIVE_WH"
+      }
+    },
+    "dtc_bulletin_search": {
+      "search_service": "AUTOMOTIVE_INTELLIGENCE_DB.PUBLIC.DTC_BULLETIN_SEARCH_SERVICE",
+      "id_column": "DOC_ID",
+      "title_column": "TITLE",
+      "max_results": 4
+    },
+    "compliance_remediation_search": {
+      "search_service": "AUTOMOTIVE_INTELLIGENCE_DB.PUBLIC.COMPLIANCE_REMEDIATION_SEARCH_SERVICE",
+      "id_column": "DOC_ID",
+      "title_column": "TITLE",
+      "max_results": 4
+    },
+    "code_execution": {},
+    "incident_triage": {
+      "type": "procedure",
+      "identifier": "AUTOMOTIVE_INTELLIGENCE_DB.PUBLIC.SP_AI_INCIDENT_TRIAGE",
+      "execution_environment": {
+        "type": "warehouse",
+        "warehouse": "AUTOMOTIVE_WH"
+      }
+    },
+    "ota_dispatch": {
+      "type": "procedure",
+      "identifier": "AUTOMOTIVE_INTELLIGENCE_DB.PUBLIC.SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION",
+      "execution_environment": {
+        "type": "warehouse",
+        "warehouse": "AUTOMOTIVE_WH"
+      }
+    }
+  }
+}
