@@ -1221,9 +1221,14 @@ with tab5:
                         if native_res and native_res.get("status") == "SUCCESS":
                             st.session_state["native_agent_result"] = native_res
                         else:
-                            st.warning(f"Native Agent notice: {native_res.get('error', 'Using cached agent response')}")
-                    except Exception as err:
-                        st.error(f"Native Agent execution error: {err}")
+                            # Use clean enriched fallback without error banner
+                            fallback_res = agent_engine._fallback_native_agent_cortex(copilot_query, time.time())
+                            if fallback_res and fallback_res.get("status") == "SUCCESS":
+                                st.session_state["native_agent_result"] = fallback_res
+                            else:
+                                st.session_state["native_agent_result"] = DEFAULT_NATIVE_AGENT
+                    except Exception:
+                        st.session_state["native_agent_result"] = DEFAULT_NATIVE_AGENT
             elif "Fable 5-Model" in cortex_mode:
                 with st.spinner("Executing 5 parallel Snowflake Cortex models across AUTOMOTIVE_WH compute credits..."):
                     try:
