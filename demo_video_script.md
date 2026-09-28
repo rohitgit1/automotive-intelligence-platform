@@ -1,107 +1,118 @@
-# 🎬 3 to 4-Minute High-Level Video Presentation Script & Recording Guide
-## Automotive Intelligence Platform | Hackathon Final Evaluation
+# 🎬 3 to 4-Minute High-Impact Video Presentation Script
+## Automotive Intelligence Platform | Final Hackathon Walkthrough
+
+> **Presentation Strategy**: Instead of *telling* the judges this is innovative or impressive, we *show* them concrete outcomes: **300K telemetry rows processed in 1 minute**, **6 weeks of manual engineering compressed into 5 seconds**, and **$8.94M saved by automatically deploying a firmware fix before physical parts break**.
 
 ---
 
-### 🖥️ Your 5 Pre-Opened Tabs in Chrome (In Exact Recording Order)
+### 🖥️ Your 5 Browser Tabs & Screen Setup (Click In Order)
 
-Every tab is already open and loaded in your browser window:
-
-| Tab # | Page Name / Component | URL | What to Show on Screen |
+| Tab # | Page / Application | URL | What You Show on Screen |
 | :---: | :--- | :--- | :--- |
-| **Tab 1** | **3D Digital Twin & Fleet Command** | `https://rohitgit1.github.io/automotive-intelligence-platform/` | Rotate 3D battery module with mouse, point to **-19°C Polar Vortex thermal dynamics**, live telemetry counters, and click the **"Simulate Autonomous OTA"** action button. |
-| **Tab 2** | **Streamlit in Snowflake (SiS)** | `https://app.snowflake.com/bljohcq/fob95633/#/streamlit-apps/AUTOMOTIVE_INTELLIGENCE_DB.PUBLIC.AUTOMOTIVE_INTELLIGENCE_PLATFORM` | Show high-level KPI cards (10K VINs, 302K telemetry records, 5,210 DTC anomalies), Fleet Command, AI Root Cause Analysis, and Supplier Warranty Clawback ledger. |
-| **Tab 3** | **Snowflake Native Agent Studio** | `https://app.snowflake.com/bljohcq/fob95633/#/agents/database/AUTOMOTIVE_INTELLIGENCE_DB/schema/PUBLIC/agent/AUTOMOTIVE_QUALITY_AGENT` | Show **`AUTOMOTIVE_QUALITY_AGENT`** in Agent Studio! Point out the agent tools (DTC search, Compliance search, OTA Stored Procedure, semantic models) and the live chat interface. |
-| **Tab 4** | **Snowflake Database Catalog** | `https://app.snowflake.com/bljohcq/fob95633/#/data/databases/AUTOMOTIVE_INTELLIGENCE_DB/schemas/PUBLIC` | Show `AUTOMOTIVE_INTELLIGENCE_DB` schema: `DT_REALTIME_VEHICLE_QUALITY_ALERTS` (1-min lag Dynamic Table), 11 raw tables, 9 analytical views, and dual Cortex Search services. |
-| **Tab 5** | **GitHub Codebase & Deployment** | `https://github.com/rohitgit1/automotive-intelligence-platform` | Show the repo structure, highlight **`deploy_all_solution.py`** (the 1-click script that provisions the entire architecture on any fresh trial account), Cortex agents, and safety procedures. |
+| **Tab 1** | **3D Battery Digital Twin (Frontend)** | `https://rohitgit1.github.io/automotive-intelligence-platform/` | Rotate 3D battery module, point to the **-19°C Polar Vortex cold stress**, and click **"Simulate Autonomous OTA"**. |
+| **Tab 2** | **Streamlit in Snowflake (SiS App)** | `https://app.snowflake.com/bljohcq/fob95633/#/streamlit-apps/AUTOMOTIVE_INTELLIGENCE_DB.PUBLIC.AUTOMOTIVE_INTELLIGENCE_PLATFORM` | Show KPI cards, fault patterns, and the **Supplier Clawback** ledger. |
+| **Tab 3** | **Snowflake Agent Studio** ⭐ | `https://app.snowflake.com/bljohcq/fob95633/#/agents/database/AUTOMOTIVE_INTELLIGENCE_DB/schema/PUBLIC/agent/AUTOMOTIVE_QUALITY_AGENT` | Paste the exact prompt into chat and show the live tool execution with citations. |
+| **Tab 4** | **Snowflake Database Explorer** | `https://app.snowflake.com/bljohcq/fob95633/#/data/databases/AUTOMOTIVE_INTELLIGENCE_DB/schemas/PUBLIC` | Show `DT_REALTIME_VEHICLE_QUALITY_ALERTS` (1-min lag Dynamic Table) and analytical views. |
+| **Tab 5** | **GitHub Repository & Codebase** | `https://github.com/rohitgit1/automotive-intelligence-platform` | Scroll down to **`deploy_all_solution.py`** (the 1-command reproducer). |
 
 ---
 
-### ⏱️ Minute-by-Minute Spoken Script (Target: 3:30 – 3:45)
+### ⏱️ Spoken Script & Screen Actions (3:30 Total)
 
 ```
-[0:00 - 0:45] TAB 1: Problem, Executive Vision & Live 3D Digital Twin
-[0:45 - 1:30] TAB 2: Streamlit in Snowflake (Continuous Telemetry, Cortex RCA & Supplier Clawback)
-[1:30 - 2:20] TAB 3: Snowflake Native Agent Studio (AUTOMOTIVE_QUALITY_AGENT & Tools)
-[2:20 - 3:00] TAB 4: Snowflake Engine Architecture (Dynamic Tables & Cortex Search)
-[3:00 - 3:45] TAB 5: Codebase Walkthrough & 1-Click Reproducibility (deploy_all_solution.py)
+[0:00 - 0:40] TAB 1: The Problem & Live 3D Subsystem View
+[0:40 - 1:25] TAB 2: Real Telemetry Patterns, Cortex RCA & Supplier Liability
+[1:25 - 2:20] TAB 3: Snowflake Native Agent Studio (Live Prompt & Tool Execution)
+[2:20 - 2:55] TAB 1: Closing the Loop (Zero-Touch OTA Firmware Remediation)
+[2:55 - 3:35] TAB 4 & TAB 5: Snowflake Streaming Architecture & 1-Click Codebase
 ```
 
 ---
 
-#### 📍 ACT 1: Vision & 3D Battery Digital Twin (0:00 – 0:45)
-**Screen**: Switch to **Tab 1** (`https://rohitgit1.github.io/automotive-intelligence-platform/`). Rotate the 3D battery module gently with your mouse.
+#### 📍 SECTION 1: The Problem & Live 3D Subsystem View (0:00 – 0:40)
+**Screen**: Show **Tab 1** (`rohitgit1.github.io/automotive-intelligence-platform`). Rotate the 3D battery pack slightly with your mouse.
 
-> **Speaker Script:**
-> *"Hello judges! For Electric Vehicle OEMs, connected vehicle telemetry, battery cell chemistry, and supplier warranty records are trapped in disconnected silos. When a battery degrades in cold weather, identifying the root cause takes 6 to 8 weeks, costing millions in warranty replacements.*
+> **Spoken Script:**
+> *"When an electric vehicle battery malfunctions in cold weather, traditional auto manufacturers spend 6 to 8 weeks trying to diagnose the issue. Telemetry is in one system, cell chemistry records are in another, and warranty claims sit in legal spreadsheets.*
 > 
-> *Today, we present the **Automotive Intelligence Platform**—an autonomous closed-loop EV quality intelligence platform built natively on Snowflake.*
+> *Here on screen, we connected all three directly inside Snowflake.*
 > 
-> *Here in our live 3D Battery Digital Twin, we monitor over 300,000 real-world telemetry events in real time. We can inspect cell voltage deltas, thermal gradients under sub-zero ambient stress, and active DTC fault codes across 10,000 connected vehicles."*
+> *In our 3D Battery Subsystem view, we are tracking 300,000 real-world driving events across 10,000 vehicles. When vehicles hit sub-zero conditions—like this -19°C Polar Vortex event in North Dakota—we immediately see cell voltage deltas and internal impedance begin to spike."*
 
 ---
 
-#### 📍 ACT 2: Streamlit in Snowflake Analytics & Supplier Clawback (0:45 – 1:30)
-**Screen**: Click over to **Tab 2** (Streamlit in Snowflake app). Scroll through the top KPI cards and click into **AI Root Cause Analysis** or **Supplier Warranty**.
+#### 📍 SECTION 2: Real Telemetry Patterns & Supplier Liability (0:40 – 1:25)
+**Screen**: Switch to **Tab 2** (Streamlit in Snowflake app). Scroll to the KPI cards and click on **Supplier Warranty Clawback**.
 
-> **Speaker Script:**
-> *"Here in our native Streamlit in Snowflake application, we turn raw telemetry into actionable engineering and financial intelligence.*
+> **Spoken Script:**
+> *"Switching to our Streamlit application running natively inside Snowflake, our queries analyzed over 300,000 telemetry readings.*
 > 
-> *Notice our fault distribution: across 300,000 telemetry events, we isolated 5,210 critical DTC fault codes affecting 749 distinct VINs. 100% of these failures occurred under sub-zero ambient temperatures below 32° Fahrenheit.*
+> *The data reveals a striking pattern: out of all vehicles, exactly 5,210 fault codes occurred across 749 cars. Every single one happened when the ambient temperature dropped below 32° Fahrenheit.*
 > 
-> *Using Snowflake Cortex Complete, our Root Cause Analysis engine cross-references DTC battery codes with supplier batch records in under 5 seconds—diagnosing electrolyte crystallization in ACME Battery's Nickel-Manganese-Cobalt cells.*
+> *Instead of an engineer manually querying databases for weeks, Snowflake Cortex cross-referenced the DTC battery errors with supplier chemistry batches in 5 seconds. The diagnosis: ACME Battery’s Nickel-Manganese-Cobalt cells suffer from electrolyte crystallization during cold fast-charging.*
 > 
-> *Furthermore, our **Supplier Warranty Clawback Ledger** automatically computes contractual indemnification liabilities—instantly generating an audited clawback claim for $8.49 Million against the defective cell batch!"*
+> *Because we linked telemetry directly to contracts, our system automatically calculated that ACME Battery is contractually liable for $8.49 Million in warranty claims—turning months of legal dispute into an audited ledger in seconds."*
 
 ---
 
-#### 📍 ACT 3: Snowflake Native Agent Studio (1:30 – 2:20) ⭐ *The Hackathon Differentiator!*
-**Screen**: Click over to **Tab 3** (Snowflake Agent Studio: `AUTOMOTIVE_QUALITY_AGENT`). Highlight the Agent details, tools, and the Preview chat prompt.
+#### 📍 SECTION 3: Live Snowflake Agent Studio Demonstration (1:25 – 2:20) ⭐
+**Screen**: Switch to **Tab 3** (Snowflake Agent Studio: `AUTOMOTIVE_QUALITY_AGENT`). 
+Paste or click this prompt into the chat box:
 
-> **Speaker Script:**
-> *"Now let's examine one of our biggest innovations: **`AUTOMOTIVE_QUALITY_AGENT`**, built inside Snowflake Cortex Agent Studio.*
+> 💬 **Exact Query to Ask the Agent:**
+> ```
+> Which supplier has the highest cold weather failure rate, and what specific firmware calibration is recommended to prevent battery damage?
+> ```
+*(Alternative short query: `What is the root cause and service bulletin procedure for DTC P1794?`)*
+
+> **Spoken Script:**
+> *"Now let's see how our Snowflake Native Agent handles this live.*
 > 
-> *This is not a simple chatbot; it is an autonomous orchestration agent equipped with real enterprise tools:*
-> 1. *It connects to our dual **Cortex Search Services** to search engineering DTC bulletins and NHTSA regulatory filings with multilingual Arctic embeddings.*
-> 2. *It queries structured semantic views across our telemetry warehouse to identify high-risk VINs.*
-> 3. *And critically, it has tool access to execute **`SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION`**—our guarded stored procedure that calculates firmware calibrations, validates SHA-256 safety hashes, and schedules OTA patches without manual intervention.*
+> *In Agent Studio, we have `AUTOMOTIVE_QUALITY_AGENT`. Rather than just generating text like a standard chatbot, this agent has tools directly connected to our warehouse.*
 > 
-> *Engineers can query fleet health, simulate failure rates, or trigger guarded remediations through natural conversation."*
+> *Notice what happens when I ask:*
+> *'Which supplier has the highest cold weather failure rate, and what specific firmware calibration is recommended?'*
+> 
+> *The agent orchestrates two tools behind the scenes:*
+> 1. *It queries our SQL semantic view `V_SUPPLIER_WARRANTY_LIABILITY` to retrieve audited failure rates.*
+> 2. *It calls our Cortex Search Service over technical service bulletins using Snowflake Arctic embeddings.*
+> 
+> *Look at the response: it cites the exact bulletin for code P1794, identifies ACME Battery's NMC811 cathode, and provides the exact engineering fix: adding a 4.5-degree preconditioning offset to the battery management software."*
 
 ---
 
-#### 📍 ACT 4: Snowflake Catalog & Streaming Architecture (2:20 – 3:00)
-**Screen**: Click over to **Tab 4** (Snowflake Database Explorer: `AUTOMOTIVE_INTELLIGENCE_DB.PUBLIC`).
+#### 📍 SECTION 4: Closing the Loop with Autonomous OTA Remediation (2:20 – 2:55)
+**Screen**: Switch back to **Tab 1** (or stay in Tab 2). Click the **"Simulate Autonomous OTA"** or **"Dispatch OTA Campaign"** button.
 
-> **Speaker Script:**
-> *"Looking under the hood in Snowflake Database Explorer, our architecture is 100% governed within Snowflake:*
+> **Spoken Script:**
+> *"Most enterprise platforms stop at reporting the problem. Our solution closes the loop.*
 > 
-> *Continuous streaming telemetry feeds into our Dynamic Table `DT_REALTIME_VEHICLE_QUALITY_ALERTS`, maintaining a 1-minute target lag to surface critical impedance anomalies instantly.*
+> *When we trigger remediation, the platform executes a guarded Snowflake Stored Procedure: `SP_DISPATCH_AUTONOMOUS_OTA_REMEDIATION`.*
 > 
-> *We have 11 core tables housing over 300,000 records, 9 high-performance analytical views for root cause and risk scoring, and Horizon Clean Room batch registries for secure supplier collaboration."*
-
----
-
-#### 📍 ACT 5: Codebase Walkthrough & 1-Click Deployment (3:00 – 3:45)
-**Screen**: Click over to **Tab 5** (GitHub repository: `rohitgit1/automotive-intelligence-platform`). Scroll to `deploy_all_solution.py`.
-
-> **Speaker Script:**
-> *"Finally, let's look at the codebase and evaluation reproducibility.*
-> 
-> *To satisfy the hackathon's requirement that the entire solution can be recreated from scratch on any trial account, we created **`deploy_all_solution.py`**.*
-> 
-> *In a single Python command, this script automates the full end-to-end setup:*
-> - *It creates the warehouse, database, tables, and populates 300,000+ telemetry rows.*
-> - *It builds the Dynamic Tables, Analytical Views, and Cortex Search Services.*
-> - *It compiles the stored procedures and deploys the Streamlit in Snowflake app and Native Agent.*
-> 
-> *By combining real-time streaming, Cortex GenAI, Snowflake ML, and autonomous OTA closed-loop remediation, the Automotive Intelligence Platform delivers **$14.2 Million** in total warranty cost avoidance.*
-> 
-> *Everything is live, fully documented, and ready for production. Thank you!"*
+> *It takes the calibration parameters from Cortex, verifies an SHA-256 safety hash, and schedules an Over-The-Air software patch to all 749 affected vehicles. By adjusting the thermal pre-heating envelope, it reduces projected 30-day battery failures by 84.3%—saving $8.94 Million in physical battery replacements before a single customer has to visit a dealership."*
 
 ---
 
-### 🎬 Recording Tips for You:
-1. Keep the tabs in order (Tab 1 → 2 → 3 → 4 → 5).
-2. Spend ~40–50 seconds on each tab without pausing.
-3. Keep your mouse steady and highlight items as you speak about them!
+#### 📍 SECTION 5: Snowflake Architecture & 1-Click Reproducibility (2:55 – 3:35)
+**Screen**: Quickly show **Tab 4** (Snowflake Database Explorer: `DT_REALTIME_VEHICLE_QUALITY_ALERTS`), then switch to **Tab 5** (GitHub: `deploy_all_solution.py`).
+
+> **Spoken Script:**
+> *"Under the hood in Snowflake Database Explorer, this is powered by a Dynamic Table with a 1-minute target lag, continuously transforming incoming vehicle data.*
+> 
+> *Finally, to ensure complete evaluation reproducibility, we created **`deploy_all_solution.py`** in our GitHub repository.*
+> 
+> *Running this single Python script automatically sets up the entire platform on any fresh Snowflake trial account in under 3 minutes—recreating all 11 tables, 300,000 telemetry rows, dynamic tables, Cortex Search services, stored procedures, and the Streamlit application.*
+> 
+> *By unifying streaming telemetry, Cortex AI, and autonomous firmware remediation in a single governed perimeter, we turned a 6-week manual warranty process into a real-time, closed-loop system. Thank you!"*
+
+---
+
+### 📋 Video Recording Cheat-Sheet:
+
+| Timeline | Tab | Key Talking Point |
+| :---: | :---: | :--- |
+| **0:00 - 0:40** | **Tab 1 (3D Web App)** | Silos cause 6-week delays; 3D model shows 300K events and -19°C Polar Vortex stress. |
+| **0:40 - 1:25** | **Tab 2 (Streamlit)** | 5,210 faults all occurred below 32°F; ACME battery NMC811 defect; $8.49M clawback. |
+| **1:25 - 2:20** | **Tab 3 (Agent Studio)** | **Live Prompt**: *Which supplier has the highest cold weather failure rate...?* Shows tool execution & citations. |
+| **2:20 - 2:55** | **Tab 1 / Tab 2** | Click **"Simulate Autonomous OTA"**: Stored procedure writes SHA-256 patch, saving $8.94M. |
+| **2:55 - 3:35** | **Tab 4 & Tab 5** | 1-min lag Dynamic Table + **`deploy_all_solution.py`** (1-click full reproducibility). |
